@@ -1,0 +1,29 @@
+# Thesis source material (read-only reference, not part of the article repo)
+TFG22/
+
+# Compiled PDFs (built by CI, not committed)
+*.pdf
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bbl-SAVE-ERROR
+*.bcf
+*.bcf-SAVE-ERROR
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.xdv
+*.nav
+*.snm
+*.vrb
+
+# OS/editor cruft
+.DS_Store
