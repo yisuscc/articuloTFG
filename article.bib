@@ -1,0 +1,506 @@
+% article.bib — entries migrated from TFG22/TFG-yisuscc.bib (cited subset)
+
+@techreport{SanDiskExtreme128,
+  author      = {{Western Digital Corporation}},
+  title       = {{SanDisk} Extreme {UHS-I} {microSD} Memory Card},
+  institution = {Western Digital Corporation},
+  year        = {2022},
+  type        = {Datasheet},
+  note        = {128~GB. \url{https://documents.sandisk.com/content/dam/asset-library/en_us/assets/public/sandisk/product/memory-cards/extreme-uhs-i-microsd/data-sheet-extreme-uhs-i-microsd-190mbps.pdf}}
+}
+
+@misc{vaswani_attention_2023,
+	title = {Attention {Is} {All} {You} {Need}},
+	url = {http://arxiv.org/abs/1706.03762},
+	doi = {10.48550/arXiv.1706.03762},
+	abstract = {The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 Englishto-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.},
+	language = {en},
+	urldate = {2025-11-11},
+	publisher = {arXiv},
+	author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Lukasz and Polosukhin, Illia},
+	month = aug,
+	year = {2023},
+	note = {arXiv:1706.03762 [cs]},
+	keywords = {Computer Science - Computation and Language, Computer Science - Machine Learning},
+	annote = {Comment: 15 pages, 5 figures},
+	file = {PDF:C\:\\Users\\yisus\\Zotero\\storage\\3N429AVF\\Vaswani et al. - 2023 - Attention Is All You Need.pdf:application/pdf},
+}
+
+@misc{kaplan_scaling_2020,
+	title = {Scaling {Laws} for {Neural} {Language} {Models}},
+	url = {http://arxiv.org/abs/2001.08361},
+	doi = {10.48550/arXiv.2001.08361},
+	abstract = {We study empirical scaling laws for language model performance on the cross-entropy loss. The loss scales as a power-law with model size, dataset size, and the amount of compute used for training, with some trends spanning more than seven orders of magnitude. Other architectural details such as network width or depth have minimal effects within a wide range. Simple equations govern the dependence of overfitting on model/dataset size and the dependence of training speed on model size. These relationships allow us to determine the optimal allocation of a fixed compute budget. Larger models are significantly more sample-efficient, such that optimally compute-efficient training involves training very large models on a relatively modest amount of data and stopping significantly before convergence.},
+	urldate = {2025-11-15},
+	publisher = {arXiv},
+	author = {Kaplan, Jared and McCandlish, Sam and Henighan, Tom and Brown, Tom B. and Chess, Benjamin and Child, Rewon and Gray, Scott and Radford, Alec and Wu, Jeffrey and Amodei, Dario},
+	month = jan,
+	year = {2020},
+	note = {arXiv:2001.08361 [cs]},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
+	annote = {Comment: 19 pages, 15 figures},
+	file = {Preprint PDF:C\:\\Users\\yisus\\Zotero\\storage\\WIQHF8N8\\Kaplan et al. - 2020 - Scaling Laws for Neural Language Models.pdf:application/pdf;Snapshot:C\:\\Users\\yisus\\Zotero\\storage\\LSQ9FJY6\\2001.html:text/html},
+}
+
+@inproceedings{brown_language_2020,
+    address = {Red Hook, NY, USA},
+    series = {{NIPS} '20},
+    title = {Language models are few-shot learners},
+    isbn = {978-1-7138-2954-6},
+    url = {https://dl.acm.org/doi/10.5555/3495724.3495883},
+    abstract = {We demonstrate that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even becoming competitive with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks. We also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora.},
+    urldate = {2026-02-17},
+    booktitle = {Proceedings of the 34th {International} {Conference} on {Neural} {Information} {Processing} {Systems}},
+    publisher = {Curran Associates Inc.},
+    author = {Brown, Tom B. and Mann, Benjamin and Ryder, Nick and Subbiah, Melanie and Kaplan, Jared and Dhariwal, Prafulla and Neelakantan, Arvind and Shyam, Pranav and Sastry, Girish and Askell, Amanda and Agarwal, Sandhini and Herbert-Voss, Ariel and Krueger, Gretchen and Henighan, Tom and Child, Rewon and Ramesh, Aditya and Ziegler, Daniel M. and Wu, Jeffrey and Winter, Clemens and Hesse, Christopher and Chen, Mark and Sigler, Eric and Litwin, Mateusz and Gray, Scott and Chess, Benjamin and Clark, Jack and Berner, Christopher and McCandlish, Sam and Radford, Alec and Sutskever, Ilya and Amodei, Dario},
+    year = {2020},
+    pages = {1877--1901},
+}
+
+@article{emergent,title= {Emergent abilities of large language models},author	= {Barret Zoph and Colin Raffel and Dale Schuurmans and Dani Yogatama and Denny Zhou and Don Metzler and Ed H. Chi and Jason Wei and Jeff Dean and Liam B. Fedus and Maarten Paul Bosma and Oriol Vinyals and Percy Liang and Sebastian Borgeaud and Tatsunori B. Hashimoto and Yi Tay},year	= {2022},journal	= {TMLR}}
+
+@article{hu_chatgpt_2023,
+	chapter = {Technology},
+	title = {{ChatGPT} sets record for fastest-growing user base - analyst note},
+	url = {https://www.reuters.com/technology/chatgpt-sets-record-fastest-growing-user-base-analyst-note-2023-02-01/},
+	abstract = {ChatGPT, the popular chatbot from OpenAI, is estimated to have reached 100 million monthly active users in January, just two months after launch, making it the fastest-growing consumer application in history, according to a UBS study on Wednesday.},
+	language = {en},
+	urldate = {2026-02-17},
+	journal = {Reuters},
+	author = {Hu, Krystal and Hu, Krystal},
+	month = feb,
+	year = {2023},
+	file = {Snapshot:/home/yisus/Zotero/storage/7X68GZJR/chatgpt-sets-record-fastest-growing-user-base-analyst-note-2023-02-01.html:text/html},
+}
+
+@article{friha_llm-based_2024,
+	title = {{LLM}-{Based} {Edge} {Intelligence}: {A} {Comprehensive} {Survey} on {Architectures}, {Applications}, {Security} and {Trustworthiness}},
+	volume = {5},
+	issn = {2644-125X},
+	shorttitle = {{LLM}-{Based} {Edge} {Intelligence}},
+	url = {https://ieeexplore.ieee.org/abstract/document/10669603},
+	doi = {10.1109/OJCOMS.2024.3456549},
+	abstract = {The integration of Large Language Models (LLMs) and Edge Intelligence (EI) introduces a groundbreaking paradigm for intelligent edge devices. With their capacity for human-like language processing and generation, LLMs empower edge computing with a powerful set of tools, paving the way for a new era of decentralized intelligence. Yet, a notable research gap exists in obtaining a thorough comprehension of LLM-based EI architectures, which should incorporate crucial elements such as security, optimization, and responsible development. This survey aims to bridge this gap by providing a comprehensive resource for both researchers and practitioners. We explore LLM-based EI architectures in-depth, carefully analyzing state-of-the-art paradigms and design decisions. To facilitate efficient and scalable edge deployments, we perform a comparative analysis of recent optimization and autonomy techniques specifically designed for resource-constrained edge environments. Additionally, we shed light on the extensive potential of LLM-based EI by demonstrating its varied practical applications across a wide range of domains. Acknowledging the utmost importance of security, our survey thoroughly investigates potential vulnerabilities inherent in LLM-based EI deployments. We explore corresponding defense mechanisms to protect the integrity and confidentiality of data processed at the edge. In conclusion, highlighting the essential aspect of trustworthiness, we outline best practices and guiding principles for the responsible development and deployment of these systems. By conducting a comprehensive review of these key components, our survey aims to support the ethical development and strategic implementation of LLM-driven EI, paving the way for its transformative impact on diverse applications.},
+	urldate = {2025-04-14},
+	journal = {IEEE Open Journal of the Communications Society},
+	author = {Friha, Othmane and Amine Ferrag, Mohamed and Kantarci, Burak and Cakmak, Burak and Ozgun, Arda and Ghoualmi-Zine, Nassira},
+	year = {2024},
+	keywords = {Real-time systems, Artificial intelligence, Computational modeling, Edge intelligence (EI), generative AI, large language models (LLMs), privacy, responsible AI, Robot sensing systems, security, Security, Surveys, Technological innovation, trustworthiness},
+	pages = {5799--5856},
+	file = {Full Text PDF:C\:\\Users\\yisus\\Zotero\\storage\\232EGE8Y\\Friha et al. - 2024 - LLM-Based Edge Intelligence A Comprehensive Survey on Architectures, Applications, Security and Tru.pdf:application/pdf},
+}
+
+@incollection{kamath_llms_2024,
+	address = {Cham},
+	title = {{LLMs}: {Evolution} and {New} {Frontiers}},
+	isbn = {978-3-031-65647-7},
+	shorttitle = {{LLMs}},
+	url = {https://link.springer.com/10.1007/978-3-031-65647-7_10},
+	language = {en},
+	urldate = {2025-11-15},
+	booktitle = {Large {Language} {Models}: {A} {Deep} {Dive}},
+	publisher = {Springer Nature Switzerland},
+	author = {Kamath, Uday and Keenan, Kevin and Somers, Garrett and Sorenson, Sarah},
+	collaborator = {Kamath, Uday and Keenan, Kevin and Somers, Garrett and Sorenson, Sarah},
+	year = {2024},
+	doi = {10.1007/978-3-031-65647-7_10},
+	pages = {423--438},
+	file = {PDF:C\:\\Users\\yisus\\Zotero\\storage\\UECW6A4P\\Kamath et al. - 2024 - LLMs Evolution and New Frontiers.pdf:application/pdf},
+}
+
+@software{gerganov_llamacpp_2023,
+  author       = {Gerganov, Georgi and others},
+  title        = {{llama.cpp}},
+  year         = {2023},
+  publisher    = {GitHub},
+  url          = {https://github.com/ggml-org/llama.cpp}
+ 
+}
+
+@software{ollama_2023,
+  author       = {Ollama contributors},
+  title        = {{Ollama}},
+  year         = {2023},
+  publisher    = {GitHub},
+  url          = {https://github.com/ollama/ollama}
+
+}
+
+@incollection{velasco-montero_case_2022,
+    address = {Cham},
+    title = {A {Case} {Study}: {Remote} {Animal} {Monitoring}},
+    isbn = {978-3-030-90903-1},
+    shorttitle = {A {Case} {Study}},
+    url = {https://link.springer.com/10.1007/978-3-030-90903-1_6},
+    doi = {10.1007/978-3-030-90903-1_6},
+    language = {en},
+    urldate = {2026-02-13},
+    booktitle = {Visual {Inference} for {IoT} {Systems}: {A} {Practical} {Approach}},
+    publisher = {Springer International Publishing},
+    author = {Velasco-Montero, Delia and Fernández-Berni, Jorge and Rodríguez-Vázquez, Angel},
+    collaborator = {Velasco-Montero, Delia and Fernández-Berni, Jorge and Rodríguez-Vázquez, Angel},
+    year = {2022},
+    pages = {125--159},
+}
+
+@article{velasco-montero_-site_2026,
+    title = {On-site acoustic identification of bird species based on a shallow neural network},
+    volume = {94},
+    issn = {1574-9541},
+    url = {https://www.sciencedirect.com/science/article/pii/S1574954126000932},
+    doi = {https://doi.org/10.1016/j.ecoinf.2026.103687},
+    abstract = {Passive acoustic monitoring is a powerful tool for biodiversity assessment, but it often requires collecting massive amounts of data that are processed off-site, a procedure that is costly, time-intensive, and generates a significant carbon footprint. To address this, we present a method for on-site acoustic identification of bird species using a shallow neural network (NN) embedded in an AudioMoth recording unit. Focusing on the lesser kestrel (Falco naumanni) as a model species, the proposed algorithm leverages a shallow NN with a single hidden layer to classify 32-ms audio segments. The network processes a feature vector composed of 12 Mel Frequency Cepstral Coefficients (MFCCs) and their corresponding delta coefficients to determine the presence or absence of the target species. The complete identification algorithm was successfully integrated in the AudioMoth firmware, enabling real-time, on-site analysis without the need for additional hardware. The system demonstrated similar performance to that of BirdNet in identifying lesser kestrel’s calls in field tests, reaching a maximum F1-score of 0.89. Power consumption measurements are also reported. The proposed methodology is general and can be adapted for other species.},
+    journal = {Ecological Informatics},
+    author = {Velasco-Montero, Delia and Lozano-Pons, Carmen and Fernández-Berni, Jorge and Bastianelli, Giulia},
+    year = {2026},
+    keywords = {AudioMoth, Bird species identification, Lesser kestrel, Neural network, On-site processing, Passive acoustic monitoring},
+    pages = {103687},
+}
+
+@article{reynolds_potential_2025,
+	title = {The potential for {AI} to revolutionize conservation: a horizon scan},
+	volume = {40},
+	issn = {01695347},
+	shorttitle = {The potential for {AI} to revolutionize conservation},
+	url = {https://linkinghub.elsevier.com/retrieve/pii/S0169534724002866},
+	doi = {10.1016/j.tree.2024.11.013},
+	language = {en},
+	number = {2},
+	urldate = {2025-10-21},
+	journal = {Trends in Ecology \& Evolution},
+	author = {Reynolds, Sam A. and Beery, Sara and Burgess, Neil and Burgman, Mark and Butchart, Stuart H.M. and Cooke, Steven J. and Coomes, David and Danielsen, Finn and Di Minin, Enrico and Durán, América Paz and Gassert, Francis and Hinsley, Amy and Jaffer, Sadiq and Jones, Julia P.G. and Li, Binbin V. and Mac Aodha, Oisin and Madhavapeddy, Anil and O'Donnell, Stephanie A.L. and Oxbury, William M. and Peck, Lloyd and Pettorelli, Nathalie and Rodríguez, Jon Paul and Shuckburgh, Emily and Strassburg, Bernardo and Yamashita, Hiromi and Miao, Zhongqi and Sutherland, William J.},
+	month = feb,
+	year = {2025},
+	pages = {191--207},
+}
+
+@article{miao_new_2026,
+    title = {New frontiers in artificial intelligence for biodiversity research and conservation with multimodal language models},
+    volume = {17},
+    copyright = {© 2025 The Author(s). Methods in Ecology and Evolution published by John Wiley \& Sons Ltd on behalf of British Ecological Society.},
+    issn = {2041-210X},
+    url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/2041-210x.70120},
+    doi = {10.1111/2041-210x.70120},
+    abstract = {The integration of artificial intelligence (AI) into biodiversity research and conservation is growing rapidly, demonstrating great potential in reducing the intensive human labour required for data preprocessing, thereby, facilitating larger data collections that offer ecological insights at unprecedented scales. However, most of these AI applications for biodiversity are still in the early stages of development, hindered by challenges inherent in real-world datasets and the limited accessibility of these technologies to practitioners without extensive programming knowledge. The recent advent of multimodal language models, which can process and generate multiple data modalities, has significantly expanded the realm of possible AI applications in biodiversity research. These models have demonstrated the ability to classify species and recognize more complex concepts, such as animal postures and orientations, without prior exposure during training. Multimodal language models can also provide explanations for their predictions and interact with humans in natural language, thereby making them more transparent, intuitive and accessible to non-specialists. Despite these advancements, the use of multimodal language models for biodiversity still needs to overcome unique barriers to application, including high computational and financial demands, reliance on prompt engineering for consistent model performance on large datasets and insufficient open-source sharing of state-of-the-art methods. This paper explores the transformative potential of multimodal language models for biodiversity research and discusses several possible applications in biodiversity research. We also discuss challenges to implement these models in real-world conservation scenarios and propose directions for future research to overcome these hurdles. Our goal is to encourage robust discussions and research into the integration of multimodal language models to advance AI for biodiversity research and conservation.},
+    language = {en},
+    number = {2},
+    urldate = {2026-06-06},
+    journal = {Methods in Ecology and Evolution},
+    author = {Miao, Zhongqi and Zhang, Yuanhan and Fabian, Zalan and Hernandez Celis, Andres and Beery, Sara and Li, Chunyuan and Liu, Ziwei and Gupta, Amrita and Nasir, Md and Li, Wanhua and Holmberg, Jason and Palmer, Meredith and Gaynor, Kaitlyn and Arbelaez, Pablo and Wang, Pengce and Dodhia, Rahul and Ferres, Juan Lavista},
+    year = {2026},
+    keywords = {AI for biodiversity, AI for conservation, explainable AI, few-shot learning, generative AI, human machine interaction, multimodal language models, zero-shot learning},
+    pages = {238--256},
+}
+
+@misc{ggml-org_gguf,
+  author       = {{ggml-org}},
+  title        = {{GGUF File Format Specification}},
+  howpublished = {\url{https://github.com/ggml-org/ggml/blob/master/docs/gguf.md}},
+  year         = {2023},
+  note         = {Accedido: 11 de junio de 2026}
+}
+
+@inproceedings{kurtic_give_2025,
+    address = {Vienna, Austria},
+    title = {“{Give} {Me} {BF16} or {Give} {Me} {Death}”? {Accuracy}-{Performance} {Trade}-{Offs} in {LLM} {Quantization}},
+    isbn = {979-8-89176-251-0},
+    shorttitle = {“{Give} {Me} {BF16} or {Give} {Me} {Death}”?},
+    url = {https://aclanthology.org/2025.acl-long.1304/},
+    doi = {10.18653/v1/2025.acl-long.1304},
+    abstract = {Despite the popularity of large language model (LLM) quantization for inference acceleration, significant uncertainty remains regarding the accuracy-performance trade-offs associated with various quantization formats. We present a comprehensive empirical study of quantized accuracy, evaluating popular quantization formats (FP8, INT8, INT4) across academic benchmarks and real-world tasks, on the entire Llama-3.1 model family. Additionally, our study examines the difference in text generated by quantized models versus their uncompressed counterparts. Beyond benchmarks, we also present a couple of quantization improvements which allowed us to obtain state-of-the-art accuracy recovery results. Our investigation, encompassing over 500,000 individual evaluations, yields several key findings: (1) FP8 weight and activation quantization (W8A8-FP) is lossless across all model scales, (2) INT8 weight and activation quantization (W8A8-INT), when properly tuned, incurs surprisingly low 1-3\% accuracy degradation, and (3) INT4 weight-only quantization (W4A16-INT) is competitive with 8-bit integer weight and activation quantization. To address the question of the “best” format for a given deployment environment, we conduct inference performance analysis using the popular open-source vLLM framework on various GPU architectures. We find that W4A16 offers the best cost-efficiency for synchronous deployments, and for asynchronous deployment on mid-tier GPUs. At the same time, W8A8 formats excel in asynchronous deployment of mid and large-size models on high-end GPUs. Our results provide a first set of practical guidelines for deploying quantized LLMs across different scales and performance requirements.},
+    urldate = {2026-02-15},
+    booktitle = {Proceedings of the 63rd {Annual} {Meeting} of the {Association} for {Computational} {Linguistics} ({Volume} 1: {Long} {Papers})},
+    publisher = {Association for Computational Linguistics},
+    author = {Kurtic, Eldar and Marques, Alexandre Noll and Pandit, Shubhra and Kurtz, Mark and Alistarh, Dan},
+    editor = {Che, Wanxiang and Nabende, Joyce and Shutova, Ekaterina and Pilehvar, Mohammad Taher},
+    month = jul,
+    year = {2025},
+    pages = {26872--26886},
+}
+
+@misc{Github_Issue_Ollama,
+	year = {2025},
+	title = {Different load times for an already loaded model, {Why}? · {Issue} \#12443 · ollama/ollama},
+	shorttitle = {Different load times for an already loaded model, {Why}?},
+	url = {https://github.com/ollama/ollama/issues/12443},
+	abstract = {I'm currently doing a benchmarking tool with ollama and noticed that it reports a different load time for each prompt fed (see the column load\_duration in the picture below) when the model should s...},
+	language = {en},
+	urldate = {2026-06-13},
+	journal = {GitHub},
+	file = {Snapshot:/home/yisus/Zotero/storage/97X6XD79/12443.html:text/html},
+}
+
+@misc{raspberrypi_ai_hat_plus_2_product_brief,
+	year = {2026},
+author       = {{Raspberry Pi}},
+title        = {{Raspberry Pi AI HAT Plus 2: Product brief}},
+howpublished = {\url{https://pip-assets.raspberrypi.com/categories/1319-raspberry-pi-ai-hat-2/documents/RP-009655-MM.pdf}}
+
+}
+
+@incollection{velasco-montero_optimal_2022,
+	address = {Cham},
+	title = {Optimal {Selection} of {Software} and {Models} for {Visual} {Inference}},
+	isbn = {978-3-030-90903-1},
+	url = {https://doi.org/10.1007/978-3-030-90903-1_3},
+	abstract = {The vast technological ecosystem of components for visual inference on edge devices makes it difficult to determine the best option according to the target application specifications. For instance, power consumption is crucial for edge smart cameras, whereas real-time processing may be a requisite for other applications. This chapter describes two graphical methodologies to select the optimum combination of convolutional neural network and software framework for boosting visual performance on embedded systems. Three indicators of inference performance—accuracy, throughput, and power consumption—will represent the decision variables for optimization. Both single-objective and multi-objective problems regarding those metrics are introduced in this chapter. Prior to conducting optimization, real values of inference performance must be obtained by benchmarking a diversity of components. In particular, the proposed methodologies are illustrated through a study comprising six popular network models running on four deep learning frameworks implemented on a low-cost embedded platform. Practical tips for integrating those components are also accompanied. In the first methodology, Pareto-optimal solutions—i.e., network–framework combinations—enable pairwise metric assessment. When more than two application-level parameters come into play, we propose a second methodology based on the definition of a figure of merit that will facilitate optimal decisions. In fact, several application scenarios can be evaluated by sweeping the relative importance of performance variables. These procedures reveal that only a reduced subset of network–software pairs should actually be considered for real deployment when targeting a specific embedded application.},
+	language = {en},
+	urldate = {2025-02-03},
+	booktitle = {Visual {Inference} for {IoT} {Systems}: {A} {Practical} {Approach}},
+	publisher = {Springer International Publishing},
+	author = {Velasco-Montero, Delia and Fernández-Berni, Jorge and Rodríguez-Vázquez, Angel},
+	editor = {Velasco-Montero, Delia and Fernández-Berni, Jorge and Rodríguez-Vázquez, Angel},
+	year = {2022},
+	doi = {10.1007/978-3-030-90903-1_3},
+	pages = {31--60},
+	file = {Full Text PDF:C\:\\Users\\yisus\\Zotero\\storage\\5C699RDK\\Velasco-Montero et al. - 2022 - Optimal Selection of Software and Models for Visual Inference.pdf:application/pdf},
+}
+
+@incollection{velasco-montero_relevant_2022,
+	address = {Cham},
+	title = {Relevant {Hardware} {Metrics} for {Performance} {Evaluation}},
+	isbn = {978-3-030-90903-1},
+	url = {https://doi.org/10.1007/978-3-030-90903-1_4},
+	abstract = {This chapter presents a dual approach to assess embedded network inference performance. On the one hand, low-level hardware exploitation metrics reveal how the resources in the processor are exploited during visual inference. On the other hand, several performance parameters—throughput, power consumption, memory footprint, or CPU utilization—describe the actual system performance. More specifically, both CNN architectures—with diverse complexity and accuracy—and deep learning libraries—which adopt various coding strategies—show notable differences in terms of microarchitecture metrics when experimentally assessed. In addition, these software–hardware combinations also present a dissimilar behavior revealed by heterogeneous high-level performance metrics. Therefore, the proposed hardware-aware analysis is a powerful tool to understand software performance and find limitations and bottlenecks. In sum, a bottom-up approach for identification of correlation between measurable hardware statistics and performance figures provides insight to improve the performance of software components for network inference.},
+	language = {en},
+	urldate = {2025-02-03},
+	booktitle = {Visual {Inference} for {IoT} {Systems}: {A} {Practical} {Approach}},
+	publisher = {Springer International Publishing},
+	author = {Velasco-Montero, Delia and Fernández-Berni, Jorge and Rodríguez-Vázquez, Angel},
+	editor = {Velasco-Montero, Delia and Fernández-Berni, Jorge and Rodríguez-Vázquez, Angel},
+	year = {2022},
+	doi = {10.1007/978-3-030-90903-1_4},
+	pages = {61--88},
+	file = {Full Text PDF:C\:\\Users\\yisus\\Zotero\\storage\\I6GMKTH3\\Velasco-Montero et al. - 2022 - Relevant Hardware Metrics for Performance Evaluation.pdf:application/pdf},
+}
+
+@article{benoit-cattin_impact_2020,
+	title = {Impact of {Thermal} {Throttling} on {Long}-{Term} {Visual} {Inference} in a {CPU}-{Based} {Edge} {Device}},
+	volume = {9},
+	copyright = {https://creativecommons.org/licenses/by/4.0/},
+	issn = {2079-9292},
+	url = {https://www.mdpi.com/2079-9292/9/12/2106},
+	doi = {10.3390/electronics9122106},
+	abstract = {Many application scenarios of edge visual inference, e.g., robotics or environmental monitoring, eventually require long periods of continuous operation. In such periods, the processor temperature plays a critical role to keep a prescribed frame rate. Particularly, the heavy computational load of convolutional neural networks (CNNs) may lead to thermal throttling and hence performance degradation in few seconds. In this paper, we report and analyze the long-term performance of 80 different cases resulting from running five CNN models on four software frameworks and two operating systems without and with active cooling. This comprehensive study was conducted on a low-cost edge platform, namely Raspberry Pi 4B (RPi4B), under stable indoor conditions. The results show that hysteresis-based active cooling prevented thermal throttling in all cases, thereby improving the throughput up to approximately 90\% versus no cooling. Interestingly, the range of fan usage during active cooling varied from 33\% to 65\%. Given the impact of the fan on the power consumption of the system as a whole, these results stress the importance of a suitable selection of CNN model and software components. To assess the performance in outdoor applications, we integrated an external temperature sensor with the RPi4B and conducted a set of experiments with no active cooling in a wide interval of ambient temperature, ranging from 22 °C to 36 °C. Variations up to 27.7\% were measured with respect to the maximum throughput achieved in that interval. This demonstrates that ambient temperature is a critical parameter in case active cooling cannot be applied.},
+	language = {en},
+	number = {12},
+	urldate = {2025-02-03},
+	journal = {Electronics},
+	author = {Benoit-Cattin, Théo and Velasco-Montero, Delia and Fernández-Berni, Jorge},
+	month = dec,
+	year = {2020},
+	pages = {2106},
+	file = {Texto completo:C\:\\Users\\yisus\\Zotero\\storage\\RXLARH3A\\Benoit-Cattin et al. - 2020 - Impact of Thermal Throttling on Long-Term Visual Inference in a CPU-Based Edge Device.pdf:application/pdf},
+}
+
+@misc{li_large_2025,
+    title = {Large {Language} {Model} {Inference} {Acceleration}: {A} {Comprehensive} {Hardware} {Perspective}},
+    shorttitle = {Large {Language} {Model} {Inference} {Acceleration}},
+    url = {http://arxiv.org/abs/2410.04466},
+    doi = {10.48550/arXiv.2410.04466},
+    abstract = {Large Language Models (LLMs) have demonstrated remarkable capabilities across various fields, from natural language understanding to text generation. Compared to non-generative LLMs like BERT and DeBERTa, generative LLMs like GPT series and Llama series are currently the main focus due to their superior algorithmic performance. The advancements in generative LLMs are closely intertwined with the development of hardware capabilities. Various hardware platforms exhibit distinct hardware characteristics, which can help improve LLM inference performance. Therefore, this paper comprehensively surveys efficient generative LLM inference on different hardware platforms. First, we provide an overview of the algorithm architecture of mainstream generative LLMs and delve into the inference process. Then, we summarize different optimization methods for different platforms such as CPU, GPU, FPGA, ASIC, and PIM/NDP, and provide inference results for generative LLMs. Furthermore, we perform a qualitative and quantitative comparison of inference performance with batch sizes 1 and 8 on different hardware platforms by considering hardware power consumption, absolute inference speed (tokens/s), and energy efficiency (tokens/J). We compare the performance of the same optimization methods across different hardware platforms, the performance across different hardware platforms, and the performance of different methods on the same hardware platform. This provides a systematic and comprehensive summary of existing inference acceleration work by integrating software optimization methods and hardware platforms. We point out that three trends (multimodality, inference-time compute, and higher inference energy efficiency) are promising to redefine the capabilities of edge artificial intelligence systems. Our project is available at https://dai.sjtu.edu.cn/project.html.},
+    urldate = {2025-12-26},
+    author = {Li, Jinhao and Xu, Jiaming and Huang, Shan and Chen, Yonghua and Li, Wen and Liu, Jun and Lian, Yaoxiu and Pan, Jiayi and Ding, Li and Zhou, Hao and Wang, Yu and Dai, Guohao},
+    month = jun,
+    year = {2025},
+}
+
+@misc{chen_inference_2025,
+	title = {Inference performance evaluation for {LLMs} on edge devices with a novel benchmarking framework and metric},
+	url = {http://arxiv.org/abs/2508.11269},
+	doi = {10.48550/arXiv.2508.11269},
+	abstract = {With the significant success achieved by large language models (LLMs) like LLaMA, edge computing-based LLM inference services for mobile and PC are in high demand for data privacy. However, different edge platforms have different hardware characteristics and the large demand for memory capacity and bandwidth makes it very challenging to deploy and benchmark LLMs on edge devices. In this paper, we introduce a benchmarking tool named ELIB (edge LLM inference benchmarking) to evaluate LLM inference performance of different edge platforms, and propose a novel metric named MBU to indicate the percentage of the theoretically efficient use of available memory bandwidth for a specific model running on edge hardware to optimize memory usage. We deploy ELIB on three edge platforms and benchmark using five quantized models to optimize MBU in combination with other metrics such as FLOPS, throughput, latency and accuracy. And we analyze the results to derive the key factors, constraints, unpredictability in optimizing MBU that can guide deploying LLMs on more edge platforms.},
+	language = {en},
+	urldate = {2025-11-11},
+	publisher = {arXiv},
+	author = {Chen, Hao and Tian, Cong and He, Zixuan and Yu, Bin and Liu, Yepang and Cao, Jialun},
+	month = aug,
+	year = {2025},
+	note = {arXiv:2508.11269 [cs]},
+	keywords = {Computer Science - Performance},
+	file = {PDF:C\:\\Users\\yisus\\Zotero\\storage\\PGT6CSGV\\Chen et al. - 2025 - Inference performance evaluation for LLMs on edge devices with a novel benchmarking framework and me.pdf:application/pdf},
+}
+
+@INPROCEEDINGS{11105796,
+  author={Arya, Mayank and Simmhan, Yogesh},
+  booktitle={2025 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)}, 
+  title={Understanding the Performance and Power of LLM Inferencing on Edge Accelerators}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={1108-1111},
+  keywords={Quantization (signal);Systematics;Navigation;Large language models;Mission critical systems;Random access memory;Graphics processing units;Throughput;Robot sensing systems;Optimization;edge llm;edge computing},
+  doi={10.1109/IPDPSW66978.2025.00173}}
+
+@misc{sobhani_sustainability_2025,
+    title = {On the {Sustainability} of {AI} {Inferences} in the {Edge}},
+    url = {http://arxiv.org/abs/2507.23093},
+    doi = {10.48550/arXiv.2507.23093},
+    abstract = {The proliferation of the Internet of Things (IoT) and its cutting-edge AI-enabled applications (e.g., autonomous vehicles and smart industries) combine two paradigms: data-driven systems and their deployment on the edge. Usually, edge devices perform inferences to support latency-critical applications. In addition to the performance of these resource-constrained edge devices, their energy usage is a critical factor in adopting and deploying edge applications. Examples of such devices include Raspberry Pi (RPi), Intel Neural Compute Stick (INCS), NVIDIA Jetson nano (NJn), and Google Coral USB (GCU). Despite their adoption in edge deployment for AI inferences, there is no study on their performance and energy usage for informed decision-making on the device and model selection to meet the demands of applications. This study fills the gap by rigorously characterizing the performance of traditional, neural networks, and large language models on the above-edge devices. Specifically, we analyze trade-offs among model F1 score, inference time, inference power, and memory usage. Hardware and framework optimization, along with external parameter tuning of AI models, can balance between model performance and resource usage to realize practical edge AI deployments.},
+    urldate = {2025-12-11},
+    publisher = {arXiv},
+    author = {Sobhani, Ghazal and Ifath, Md Monzurul Amin and Sharma, Tushar and Haque, Israat},
+    month = jul,
+    year = {2025},
+    note = {arXiv:2507.23093},
+    keywords = {Computer Science - Artificial Intelligence, Computer Science - Machine Learning, Computer Science - Performance},
+}
+
+@article{husom_sustainable_2025,
+    author = {Husom, Erik Johannes and Goknil, Arda and Astekin, Merve and Shar, Lwin Khin and K{\r{a}}sen, Andre and Sen, Sagar and Mithassel, Benedikt Andreas and Soylu, Ahmet},
+    title = {Sustainable LLM Inference for Edge AI: Evaluating Quantized LLMs for Energy Efficiency, Output Accuracy, and Inference Latency},
+    year = {2025},
+    issue_date = {November 2025},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {6},
+    number = {4},
+    url = {https://doi.org/10.1145/3767742},
+    doi = {10.1145/3767742},
+    abstract = {Deploying Large Language Models (LLMs) on edge devices presents significant challenges due to computational constraints, memory limitations, inference speed, and energy consumption. Model quantization has emerged as a key technique to enable efficient LLM inference by reducing model size and computational overhead. In this study, we conduct a comprehensive analysis of 28 quantized LLMs from the Ollama library, which applies by default Post-Training Quantization (PTQ) and weight-only quantization techniques, deployed on an edge device (Raspberry Pi 4 with 4 GB RAM). We evaluate energy efficiency, inference performance, and output accuracy across multiple quantization levels and task types. Models are benchmarked on five standardized datasets (CommonsenseQA, BIG-Bench Hard, TruthfulQA, GSM8K, and HumanEval), and we employ a high-resolution, hardware-based energy measurement tool to capture real-world power consumption. Our findings reveal the trade-offs between energy efficiency, inference speed, and accuracy in different quantization settings, highlighting configurations that optimize LLM deployment for resource-constrained environments. By integrating hardware-level energy profiling with LLM benchmarking, this study provides actionable insights for sustainable AI, bridging a critical gap in existing research on energy-aware LLM deployment.},
+    journal = {ACM Trans. Internet Things},
+    month = nov,
+    articleno = {28},
+    numpages = {35},
+    keywords = {LLMs, quantized models, edge AI, energy efficiency, edge computing, sustainability}
+    }
+
+@misc{BCM2712Doc,
+  author       = {{Raspberry Pi Ltd}},
+  title        = {Processors --- Raspberry Pi Documentation},
+  year         = {2026},
+  url          = {https://www.raspberrypi.com/documentation/computers/processors.html},
+  note         = {Section: BCM2712, Accessed: Jun. 9, 2026}
+}
+
+@misc{merity2016pointer,
+      title={Pointer Sentinel Mixture Models},
+      author={Stephen Merity and Caiming Xiong and James Bradbury and Richard Socher},
+      year={2016},
+      eprint={1609.07843},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+
+@article{whatmough_generative_2025,
+	title = {Generative {Artificial} {Intelligence} on {Edge} {Devices}: {Models}, {Hardware}, and {Systems}: {A} tutorial},
+	volume = {17},
+	issn = {1943-0590},
+	shorttitle = {Generative {Artificial} {Intelligence} on {Edge} {Devices}},
+	url = {https://ieeexplore.ieee.org/document/11131398/},
+	doi = {10.1109/MSSC.2025.3579704},
+	abstract = {Generative artificial intelligence (GenAI) refers to the use of neural networks to produce new output data, which could be in the form of text, image, audio, video, or other modalities. During training, these models learn the underlying distributions of the data such that, during inference, they can generate new output data in response to an input prompt (typically a text prompt). In recent years, we have witnessed a staggeringly rapid progression in capability and sophistication of these generative models, following a major boom in investment in AI research during the 2020s. This article provides a brief tutorial on GenAI for edge devices, as a summary of the tutorial of the same name given at the International Solid State Circuits Conference (ISSCC) this year.},
+	number = {3},
+	urldate = {2025-11-11},
+	journal = {IEEE Solid-State Circuits Magazine},
+	author = {Whatmough, Paul N.},
+	year = {2025},
+	keywords = {Hardware, Data models, Generative AI, Integrated circuit modeling, Investment, Neural networks, Solid state circuits, Testing, Training, Tutorials},
+	pages = {32--37},
+	file = {Full Text PDF:C\:\\Users\\yisus\\Zotero\\storage\\RZ4995PF\\Whatmough - 2025 - Generative Artificial Intelligence on Edge Devices Models, Hardware, and Systems A tutorial.pdf:application/pdf},
+}
+
+@misc{zhou_instruction-following_2023,
+	title = {Instruction-{Following} {Evaluation} for {Large} {Language} {Models}},
+	url = {http://arxiv.org/abs/2311.07911},
+	doi = {10.48550/arXiv.2311.07911},
+	abstract = {One core capability of Large Language Models (LLMs) is to follow natural language instructions. However, the evaluation of such abilities is not standardized: Human evaluations are expensive, slow, and not objectively reproducible, while LLM-based auto-evaluation is potentially biased or limited by the ability of the evaluator LLM. To overcome these issues, we introduce Instruction-Following Eval (IFEval) for large language models. IFEval is a straightforward and easy-to-reproduce evaluation benchmark. It focuses on a set of "verifiable instructions" such as "write in more than 400 words" and "mention the keyword of AI at least 3 times". We identified 25 types of those verifiable instructions and constructed around 500 prompts, with each prompt containing one or more verifiable instructions. We show evaluation results of two widely available LLMs on the market. Our code and data can be found at https://github.com/google-research/google-research/tree/master/instruction\_following\_eval},
+	urldate = {2025-02-03},
+	publisher = {arXiv},
+	author = {Zhou, Jeffrey and Lu, Tianjian and Mishra, Swaroop and Brahma, Siddhartha and Basu, Sujoy and Luan, Yi and Zhou, Denny and Hou, Le},
+	month = nov,
+	year = {2023},
+	note = {arXiv:2311.07911 [cs]},
+	keywords = {Computer Science - Artificial Intelligence, Computer Science - Computation and Language, Computer Science - Machine Learning},
+	file = {Preprint PDF:C\:\\Users\\yisus\\Zotero\\storage\\RJLYPS97\\Zhou et al. - 2023 - Instruction-Following Evaluation for Large Language Models.pdf:application/pdf;Snapshot:C\:\\Users\\yisus\\Zotero\\storage\\JM2Z85SK\\2311.html:text/html},
+}
+
+@techreport{RPi5ProductBrief2026,
+  author      = {{Raspberry Pi Ltd}},
+  title       = {{Raspberry Pi 5 Product Brief}},
+  institution = {Raspberry Pi Ltd},
+  number       = {RP-008348-DS-6},
+  year         = {2026},
+  month        = apr,
+  url          = {https://pip-assets.raspberrypi.com/categories/892-raspberry-pi-5/documents/RP-008348-DS-6-raspberry-pi-5-product-brief.pdf},
+  note         = {Accessed: Jun. 9, 2026}
+}
+
+@techreport{RPiActiveCooler2024,
+  author       = {{Raspberry Pi Ltd}},
+  title        = {{Raspberry Pi Active Cooler for Raspberry Pi 5}},
+  institution  = {Raspberry Pi Ltd},
+  number       = {RP-008188-DS-2},
+  type         = {Product Brief},
+  year         = {2024},
+  month        = apr,
+  url          = {https://pip-assets.raspberrypi.com/categories/993-raspberry-pi-active-cooler/documents/RP-008188-DS-2-raspberry-pi-active-cooler-product-brief.pdf},
+  note         = {Accessed: Jun. 9, 2026}
+}
+
+@misc{Llama32_1B_Instruct,
+  author       = {{Meta AI}},
+  title        = {Llama-3.2-1B-Instruct},
+  year         = {2024},
+  url          = {https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct},
+  note         = {Hugging Face model repository}
+}
+
+@misc{Llama32_3B_Instruct,
+  author       = {{Meta AI}},
+  title        = {Llama-3.2-3B-Instruct},
+  year         = {2024},
+  url          = {https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct},
+  note         = {Hugging Face model repository}
+}
+
+@misc{Gemma3nE2B,
+  author       = {{Google DeepMind}},
+  title        = {Gemma-3n-E2B-it},
+  year         = {2025},
+  url          = {https://huggingface.co/google/gemma-3n-E2B-it},
+  note         = {Hugging Face model repository}
+}
+
+@misc{DeepSeekR1DistillQwen15B,
+  author       = {{DeepSeek AI}},
+  title        = {DeepSeek-R1-Distill-Qwen-1.5B},
+  year         = {2025},
+  url          = {https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B},
+  note         = {Hugging Face model repository}
+}
+
+@misc{Ministral33BInstruct2512GGUF,
+  author       = {{Mistral AI}},
+  title        = {Ministral-3-3B-Instruct-2512-GGUF},
+  year         = {2025},
+  url          = {https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-GGUF},
+  note         = {Hugging Face model repository}
+}
+
+@misc{Granite4HMicroGGUF,
+  author       = {{IBM Granite Team}},
+  title        = {Granite 4.0 H-Micro GGUF},
+  year         = {2025},
+  url          = {https://huggingface.co/ibm-granite/granite-4.0-h-micro-GGUF},
+  note         = {Hugging Face model repository}
+}
+
+@misc{carrascosa_carro_tfg-yisusccscripts_2026,
+    title = {{TFG}-yisuscc/scripts},
+    url = {https://github.com/TFG-yisuscc/scripts},
+    abstract = {scripts utilizados a lo largo del tfg},
+    urldate = {2026-06-10},
+    publisher = {TFG-yisuscc},
+    author = {Carrascosa Carro, Jesús},
+    month = may,
+    year = {2026},
+}
+
+@misc{HailoDeepSeekR1Qwen15B,
+  author       = {{Hailo Technologies Ltd}},
+  title        = {DeepSeek-R1-Distill-Qwen-1.5B --- Hailo Model Explorer},
+  year         = {2026},
+  url          = {https://hailo.ai/products/hailo-software/model-explorer/generative-ai/deepseek-r1-distill-qwen-1-5b/},
+  note         = {Accessed: Jun. 9, 2026}
+}
