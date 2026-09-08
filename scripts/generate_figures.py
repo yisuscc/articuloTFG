@@ -149,15 +149,16 @@ if t_hum_mean is not None and np.isfinite(t_hum_mean):
 
 handles = [Line2D([0], [0], marker=mk_map0[m], color="gray", ls="None",
                   markersize=8, label=m) for m in models0]
-handles += [Line2D([0], [0], marker="o", color=FAN_COLORS[v], ls="None",
-                   markersize=9, label=FAN_LABELS[v]) for v in [True, False]]
+handles += [mpatches.Patch(facecolor=FAN_COLORS[v], edgecolor="white",
+                           linewidth=0.7, label=FAN_LABELS[v])
+            for v in [True, False]]
 handles += [Line2D([0], [0], color="black", ls="--", lw=1.5, label="Pareto frontier")]
 if t_hum_mean is not None and np.isfinite(t_hum_mean):
     handles += [Line2D([0], [0], color="darkorange", ls=":", lw=2,
                        label=f"$T_{{hum}} \\approx {t_hum_mean:.1f}$ tok/s")]
 ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.02, 1),
           fontsize=8, framealpha=0.9)
-ax.set_xlabel("Runtime RAM footprint (GB)")
+ax.set_xlabel("Runtime RAM footprint (GBytes)")
 ax.set_ylabel("Throughput (tok/s)")
 ax.grid(True, alpha=0.3)
 fig.tight_layout()
@@ -229,7 +230,97 @@ fig.tight_layout()
 save(fig, "e0_cooling_impact.png")
 
 # ---------------------------------------------------------------------------
-# E1 — load collection, exclude collapsed DeepSeek runs, FoM vs BPW
+# Figure 4 — E0 per-phase duration breakdown (load / prefill / decode),
+# log scale, fan vs no fan; (a) mean per prompt, (b) total per run
+# ---------------------------------------------------------------------------
+
+PHASES_PER_PROMPT = [("load_s", "Load", "#bcbd22"),
+                     ("prefill_s", "Prefill", "#17becf"),
+                     ("decode_s", "Decode", "#ff7f0e")]
+PHASES_TOTAL = [("load_total_s", "Load", "#bcbd22"),
+                ("prefill_total_s", "Prefill", "#17becf"),
+                ("decode_total_s", "Decode", "#ff7f0e")]
+
+phase_rows = []
+for run in coll0.runs:
+    meta = summary0[summary0["run_id"] == run.run_id]
+    if meta.empty:
+        continue
+    non_empty = [p for p in run.prompts if not p.is_empty_generation]
+    if not non_empty:
+        continue
+    load = np.array([p.load_duration_ns / 1e9 for p in non_empty])
+    prefill = np.array([p.prompt_eval_duration_ns / 1e9 for p in non_empty])
+    decode = np.array([p.eval_duration_ns / 1e9 for p in non_empty])
+    phase_rows.append(dict(
+        model_clean=clean_label(meta["model_label"].values[0]),
+        fan=bool(meta["fan"].values[0]),
+        load_s=load.mean(), prefill_s=prefill.mean(), decode_s=decode.mean(),
+        load_total_s=load.sum(), prefill_total_s=prefill.sum(),
+        decode_total_s=decode.sum(),
+    ))
+pf = pd.DataFrame(phase_rows)
+
+models_ph = sorted(pf["model_clean"].unique())
+BAR_H = 0.30      # bar height
+GAP = 0.05        # fan / no-fan separation inside a model group
+SEP = 0.45        # separation between model groups
+STEP = 2 * BAR_H + GAP + SEP
+FLOOR = 1e-4      # positive origin for the log scale
+
+fig, axes = plt.subplots(1, 2, figsize=(11, max(4.5, len(models_ph) * 0.9)))
+for ax, phases, subtitle in [
+    (axes[0], PHASES_PER_PROMPT, "(a) Mean per prompt"),
+    (axes[1], PHASES_TOTAL, "(b) Total per run"),
+]:
+    ax.set_xscale("log")
+    yticks, ylabels = [], []
+    for mi, model in enumerate(models_ph):
+        y_group = mi * STEP
+        yticks.append(y_group + BAR_H + GAP / 2)
+        ylabels.append(model)
+        for fi, (fan_val, hatch) in enumerate([(True, ""), (False, "///")]):
+            sub = pf[(pf["model_clean"] == model) & (pf["fan"] == fan_val)]
+            if sub.empty:
+                continue
+            y_pos = y_group + fi * (BAR_H + GAP)
+            left = FLOOR
+            for col, _lbl, color in phases:
+                val = max(float(sub[col].values[0]), FLOOR)
+                ax.barh(y_pos, val, height=BAR_H, left=left, color=color,
+                        hatch=hatch, edgecolor="grey", linewidth=0.4, alpha=0.9)
+                left += val
+    ax.set_yticks(yticks)
+    ax.set_yticklabels(ylabels, fontsize=12)
+    ax.tick_params(axis="x", labelsize=11)
+    ax.set_xlabel("Duration (s)", fontsize=12)
+    ax.set_title(subtitle, fontsize=12)
+    ax.grid(True, axis="x", alpha=0.3, which="both")
+    ax.invert_yaxis()
+
+ph_handles = [mpatches.Patch(color=c, label=lbl) for _, lbl, c in PHASES_PER_PROMPT]
+cond_handles = [
+    mpatches.Patch(facecolor="lightgrey", edgecolor="grey", label="Fan"),
+    mpatches.Patch(facecolor="lightgrey", edgecolor="grey", hatch="///",
+                   label="No fan"),
+]
+sep_handle = Line2D([0], [0], color="none", label=" ")
+fig.legend(handles=ph_handles + [sep_handle] + cond_handles,
+           loc="upper center", bbox_to_anchor=(0.5, 1.14),
+           ncol=len(ph_handles) + 1 + len(cond_handles), fontsize=11,
+           title="Phase  \u2502  Cooling condition", title_fontsize=11,
+           frameon=True, edgecolor="grey")
+fig.tight_layout()
+save(fig, "e0_phase_breakdown.png")
+
+# report the ranges quoted in the text
+for col, lbl in [("load_s", "load"), ("prefill_s", "prefill"), ("decode_s", "decode")]:
+    print(f"  {lbl} per prompt: {pf[col].min():.2f}-{pf[col].max():.2f} s "
+          f"(fan only: {pf[pf['fan']][col].min():.2f}-{pf[pf['fan']][col].max():.2f} s)")
+
+# ---------------------------------------------------------------------------
+# Figure 5 — E1 FoM vs bits per weight (load collection, exclude collapsed
+# DeepSeek runs)
 # ---------------------------------------------------------------------------
 
 print("Loading E1 ...")
@@ -269,8 +360,9 @@ else:
 fom1["model_clean"] = fom1["model_label"].map(clean_label)
 
 fd = fom1.dropna(subset=["quantization", "bits_per_weight", "fom_full", "model_clean"])
-med_bpw = fd.groupby("quantization")["bits_per_weight"].median().sort_values()
-quant_order = med_bpw.index.tolist()
+med_bpw = fd.groupby("quantization")["bits_per_weight"].median().sort_values(
+    ascending=False)
+quant_order = med_bpw.index.tolist()  # highest bits per weight on the left
 q2pos = {q: i for i, q in enumerate(quant_order)}
 models1 = sorted(fd["model_clean"].unique())
 mk_map1 = {m: MARKER_POOL[i % len(MARKER_POOL)] for i, m in enumerate(models1)}
@@ -298,7 +390,7 @@ fig.tight_layout()
 save(fig, "e1_fom_bpw.png")
 
 # ---------------------------------------------------------------------------
-# Figure 5 — E1 WikiText-2 perplexity per model and quantization
+# Figure 6 — E1 WikiText-2 perplexity per model and quantization
 # (drops DeepSeek non-K-quant bars: Q4_0 / Q8_0 collapse)
 # ---------------------------------------------------------------------------
 
@@ -378,7 +470,7 @@ fig.tight_layout()
 save(fig, "e1_perplexity.png")
 
 # ---------------------------------------------------------------------------
-# Figure 6 — E2 throughput vs context size
+# Figure 7 — E2 throughput vs context size
 # ---------------------------------------------------------------------------
 
 print("Loading E2 ...")
