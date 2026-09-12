@@ -157,7 +157,7 @@ characterized.
 
 An exemplary domain where these needs are pressing is biodiversity conservation.
 Monitoring infrastructures based on intelligent camera
-trapping~\cite{velasco-montero_case_2022} and ecoacoustic
+trapping~\cite{ai-enabled-camera-traps} and ecoacoustic
 analysis~\cite{velasco-montero_-site_2026} are typically deployed in remote,
 low-coverage areas where continuous data transmission is infeasible and
 processing must happen on the device. Locally deployed language models could
@@ -231,11 +231,12 @@ and 8 bits per weight (bpw), as popularized by the GGUF ecosystem of
 llama.cpp~\cite{gerganov_llamacpp_2023,ggml-org_gguf}, reduces both the
 memory footprint and the per-token memory traffic; Kurtic et
 al.~\cite{kurtic_give_2025} reported that modern 4-bit schemes preserve
-generative quality within a few percent of full precision. Inference engines
-package these techniques with runtime services: llama.cpp offers a minimal
-library-level interface, whereas Ollama wraps a llama.cpp-derived core behind
-an HTTP server that simplifies deployment at the cost of per-request
-management overhead~\cite{ollama_2023,Github_Issue_Ollama}. Commercial neural
+generative quality within a few percent of full precision. The engine that executes these formats
+is a second, orthogonal factor:
+llama.cpp exposes a minimal library-level interface, whereas Ollama wraps a
+llama.cpp-derived core behind an HTTP server that trades per-request
+management overhead for ease of deployment~\cite{ollama_2023,Github_Issue_Ollama}.
+Beyond CPU, commercial neural
 accelerators such as the Hailo-10H, integrated in the Raspberry~Pi
 AI~HAT+~2~\cite{raspberrypi_ai_hat_plus_2_product_brief}, have recently begun
 to support generative models, executing them from precompiled binaries with
@@ -291,30 +292,34 @@ platforms and their coverage relative to this work.}
 Velasco-Montero et al.~\cite{velasco-montero_optimal_2022,
 velasco-montero_relevant_2022}; Benoit-Cattin et
 al.~\cite{benoit-cattin_impact_2020} &
-Hardware metrics and thermal effect &
+Hardware monitoring; thermal behavior &
 SLM inference \\
 \addlinespace[2pt]
 Chen et al.\ (ELIB)~\cite{chen_inference_2025} &
-FLOPS; MBU; latency; perplexity &
-Normalized energy; multiple engines; hardware variables \\
+Latency; compute throughput (FLOP/s); memory-bandwidth utilization (MBU);
+generative quality (perplexity); quantization &
+Multiple engines; hardware monitoring; normalized energy (J/token); model diversity (one model) \\
 \addlinespace[2pt]
 Arya and Simmhan~\cite{11105796} &
-Quantization; batch size; power modes; absolute energy &
-Tokens/J; specialized engines \\
+Hardware monitoring (incl. power modes); absolute energy (J); quantization;
+batch size &
+Specialized engines; normalized energy (J/token) \\
 \addlinespace[2pt]
 Sobhani et al.~\cite{sobhani_sustainability_2025} &
-Multi-platform; F1; power; memory &
-Specialized engines; SLM diversity \\
+Hardware monitoring (power, memory); generative quality (F1);
+multiple platforms &
+Specialized engines; model diversity \\
 \addlinespace[2pt]
 Husom et al.~\cite{husom_sustainable_2025} &
-Tokens/J; 28 quantized models; task-based quality &
-Single engine (CPU only); hardware monitoring; thermal effect \\
+Normalized energy (J/token); generative quality (task-based);
+model diversity (28 quantized models) &
+Multiple engines (CPU only); hardware monitoring; thermal behavior \\
 \midrule
 \textbf{This work} &
-Specialized engines (llama.cpp, Ollama, hailo-ollama); exhaustive hardware
-monitoring; normalized energy (J/token); thermal effect; commercial
-accelerator; model-loading cost &
-Task-based quality; multi-platform \\
+Specialized engines (llama.cpp, Ollama, hailo-ollama); commercial
+accelerator; hardware resource monitoring; normalized energy (token/J); thermal
+behavior; model diversity &
+Generative quality (task-based); multiple platforms \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -377,13 +382,10 @@ duration of each run. Energy is obtained by integrating the sampled power over
 the measurement window, $E_{\mathrm{run}}=\sum_i P_i\,\Delta t =
 \bar{P}_{\mathrm{run}}\,T_{\mathrm{run}}$, and the energy efficiency as
 $\varepsilon = T/\bar{P}_{\mathrm{run}}$ (tokens/J); the energy per token is its
-reciprocal. Phase-level quantities (power and CPU work) are likewise derived from
+reciprocal. Phase-level quantities are likewise derived from
 the samples, by assigning each of them to the load, prefill, or decode window
 delimited by the durations reported by the engine, so that no fixed cost
-distribution across phases is assumed. Windows shorter than the sampling
-period---typically load and prefill---contain no sample and are excluded; the
-phase breakdown is therefore reported in time, and the energy figures are always
-run-level. That
+distribution across phases is assumed. That
 sensor also excludes the cooler and USB peripherals, so E0--E4 values are lower
 bounds; for series E5, we used an external wall-power meter instead
 (Section~\ref{sec:results_e5}).
@@ -423,14 +425,17 @@ and this derived value of 17.1~GByte/s is the one used throughout this work.
 MBU is then computed as
 $\mathrm{MBU} = (M_{\mathrm{model}} + M_{\mathrm{KV}}) / (\mathrm{TPOT}
 \cdot BW_{\mathrm{peak}})$, with
-$\mathrm{TPOT}=t_{\mathrm{decode}}/N_{\mathrm{tokens}}$ (s/token) the mean time
-per output token and the $M$ terms the bytes read per decode step:
-$M_{\mathrm{model}} = N_{\mathrm{params}}\,\mathrm{bpw}/8$ for the weights at
-$\mathrm{bpw}$ bits per weight, and
-$M_{\mathrm{KV}} = 2\,L\,n_{\mathrm{kv}}\,d_{h}\,S\,b_{\mathrm{kv}}$ for the KV
-cache of one sequence ($L$ layers, $n_{\mathrm{kv}}$ key-value heads,
-$d_{h}=d_{\mathrm{model}}/n_{\mathrm{heads}}$, context $S$ in tokens,
-$b_{\mathrm{kv}}=2$~Byte/element in fp16; values taken from the GGUF metadata).
+$\mathrm{TPOT}$ (s/token) is the mean time per output token, and the $M$ terms
+denote the size in bytes: $M_{\mathrm{model}} = N_{\mathrm{params}}\,\mathrm{bpw}/8$
+for the weights at $\mathrm{bpw}$ bits per weight, and
+$M_{\mathrm{KV}} = B_{\mathrm{prompt}} \cdot 2 \, L \, n_{\mathrm{kv}}\, d_{h}\, S\, b_{\mathrm{kv}}$
+for the KV cache, where $B_{\mathrm{prompt}}$ is the number of prompts
+processed in parallel (set to $B_{\mathrm{prompt}}=1$ throughout this work),
+the factor $2$ accounts for storing both keys and values, $L$ is the number
+of layers, $n_{\mathrm{kv}}$ the number of key-value heads,
+$d_{h}=d_{\mathrm{model}}/n_{\mathrm{heads}}$ the head dimension, $S$ the
+context length in tokens, and $b_{\mathrm{kv}}$ the precision in bytes per
+KV element (quantization); values taken from the GGUF metadata.
 MBU is therefore dimensionless and is reported as a percentage. The
 original definition assumes a dense model that streams all weights and the
 full KV cache per step. For architectures that diverge from this pattern we
@@ -513,14 +518,14 @@ tool.\footnote{\url{https://github.com/TFG-yisuscc/MonitorSystemCplusplus}}
 It abstracts three engines behind a common interface: llama.cpp integrated as
 a static library (GGUF models), Ollama through its local HTTP API, and
 hailo-ollama, Hailo's inference server for the Hailo-10H (HEF models). A
-monitoring thread samples the hardware state (CPU frequency and usage per
+monitoring thread samples and saves the hardware state (CPU frequency and usage per
 core, temperature, fan speed, RAM, swap, and power) at a configurable period and
 streams each sample to disk, while the main thread runs the prompt sequence
-and registers per-prompt inference metrics immediately after each generation.
+and stores per-prompt inference metrics immediately after each generation.
 Each run produces three data structures---per-prompt inference metrics (JSONL),
 periodic hardware samples (JSONL), and a summary with the full configuration
 and model metadata (JSON)---in a directory marked by a nanosecond timestamp.
-Reproducibility is guaranteed by pinning the random seed and temperature:
+Reproducibility is guaranteed by pinning the random seed and sampling temperature:
 under identical hardware and model versions, outputs are deterministic.
 Google Research's full \textit{instruction\_following\_eval}
 dataset~\cite{zhou_instruction-following_2023} is embedded in the binary at
@@ -712,7 +717,7 @@ Gemma~3n & \ding{55} & 1.91 & 2.16 & 3.1 & 4.45 & 5165 & 0.642 & 29.6 & 0.402 & 
 \end{tabular}
 \end{table}
 
-Under active cooling all six models exceed the interactive-usability
+Under active cooling all six models exceed their respectives $T_{\mathrm{hum}}$
 threshold. The FoM places Ministral~3B first
 ($\mathrm{FoM}_{\mathrm{full}}=1.058$), closely followed by the
 DeepSeek-R1~1.5B distillate (1.025) and the Llama~3.2~3B reference (1.000 by
@@ -1094,7 +1099,7 @@ on both axes ($\mathrm{FoM}_{\mathrm{red}}=0.822$). For Llama-3.2-3B the
 energy gain is notable---57\% lower cost per token
 ($\varepsilon_{\mathrm{norm}}=2.320$)---which more than compensates the speed
 loss and raises $\mathrm{FoM}_{\mathrm{red}}$ to 1.107, above parity with the
-CPU. Usability qualifies this advantage: Llama-3.2-3B, usable on CPU, falls
+CPU. Usability disqualifies this advantage: Llama-3.2-3B, usable on CPU, falls
 below $T_{\mathrm{hum}}$ on the accelerator. The result must also be read in
 the context of the maturity of the generative-inference software stack for
 Hailo, considerably less optimized than the CPU stack. In its current state,
