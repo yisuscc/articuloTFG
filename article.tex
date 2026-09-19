@@ -177,7 +177,7 @@ contributions of this study are:
 \begin{itemize}
   \item \textbf{A reusable, open-source measurement infrastructure.}
     \textit{MonitorSystem}, a C++ command-line system that executes
-    reproducible inference experiments while simultaneously capturing
+    reproducible inference experiments at the egde while simultaneously capturing
     inference metrics and hardware state (CPU frequency and usage,
     temperature, memory, power), and \textit{monitorviz}, a Python library
     that automates the computation of derived metrics and comparative
@@ -254,7 +254,13 @@ for rigorous characterization. Benoit-Cattin et
 al.~\cite{benoit-cattin_impact_2020} demonstrated on a Raspberry~Pi~4B that
 thermal throttling appears within seconds under sustained load, making
 thermal control a prerequisite for reproducible experiments---a finding our
-E0 series confirms and quantifies for generative workloads.
+E0 series confirms and quantifies for generative workloads. More recently,
+Dangwal et al.~\cite{dangwal_reliable_2026} likewise treat frequency
+throttling as a first-order factor in edge deployments, although theirs is
+induced by undervoltage on shared power supplies rather than by temperature;
+they show that explicitly modeling this variability, rather than attempting to
+eliminate it, provides a practical and robust foundation for performance
+prediction.
 
 For LLMs specifically, Li et al.~\cite{li_large_2025} surveyed the impact of
 hardware accelerators (GPU, FPGA, ASIC...) on inference efficiency, without
@@ -267,8 +273,7 @@ software is not publicly available, it does not normalize energy per token,
 it does not compare specialized inference engines, and it does not monitor
 thermal or frequency state. Arya and Simmhan~\cite{11105796} evaluated LLM
 inference on an NVIDIA Jetson Orin AGX across batch size, sequence length,
-quantization, and power modes, finding that INT8 can \emph{increase} latency
-over FP16 for small models owing to dequantization overhead; their study uses
+quantization, and power modes; their study uses
 PyTorch rather than specialized engines and does not normalize energy per
 token. Sobhani et al.~\cite{sobhani_sustainability_2025} characterized
 performance and energy of small models on Raspberry~Pi and Jetson Nano
@@ -369,19 +374,23 @@ Section~\ref{sec:related}:
 
 \subsection{Metrics and Figures of Merit}\label{sec:metrics}
 
+This subsection defines the metrics studied in this work, classified in six domains.
+
 \paragraph{Inference performance.}
-Generation \emph{throughput} $T$ (tokens/s) in the decode phase;
+Generation \emph{throughput} $T$ (tokens/s) in the decode phase (throughout the
+paper, uppercase $T$ denotes throughput and lowercase $t$ denotes execution
+time);
 \emph{time-to-first-token} (TTFT, ms) between prompt submission and first
 emitted token; and \emph{time-to-load-model} (TTLM, s) between engine
-invocation and readiness.
+invocation and the start of the prefill phase.
 
 \paragraph{Energy cost.}
 Power was sampled from the internal PMIC sensor of the Raspberry~Pi~5
 (\texttt{vcgencmd pmic\_read\_adc}) at a fixed 0.25~s period for the whole
 duration of each run. Energy is obtained by integrating the sampled power over
 the measurement window, $E_{\mathrm{run}}=\sum_i P_i\,\Delta t =
-\bar{P}_{\mathrm{run}}\,T_{\mathrm{run}}$, and the energy efficiency as
-$\varepsilon = T/\bar{P}_{\mathrm{run}}$ (tokens/J); the energy per token is its
+\bar{P}_{\mathrm{run}}\,t_{\mathrm{run}}$, and our conmparison metric, energy efficiency is calculated as as
+$\varepsilon = T/\bar{P}_{\mathrm{run}}$ (tokens/J); the energy per token (J/tokens) is its
 reciprocal. Phase-level quantities are likewise derived from
 the samples, by assigning each of them to the load, prefill, or decode window
 delimited by the durations reported by the engine, so that no fixed cost
@@ -394,7 +403,7 @@ bounds; for series E5, we used an external wall-power meter instead
 To distinguish throughput limited by the model from throughput limited by
 thermal throttling, we define the effective CPU work as
 \begin{equation}
-  W_{\mathrm{CPU}} = \int_{0}^{T_{\mathrm{run}}} \frac{f(t)}{f_{\mathrm{nom}}}
+  W_{\mathrm{CPU}} = \int_{0}^{t_{\mathrm{run}}} \frac{f(t)}{f_{\mathrm{nom}}}
   \cdot \frac{U(t)}{100} \cdot N_{\mathrm{cores}}\;dt ,
 \end{equation}
 where $f(t)$ is the instantaneous frequency, $f_{\mathrm{nom}}=2.4$~GHz,
@@ -403,10 +412,10 @@ $W_{\mathrm{CPU}}$ is in nominal core-seconds (core$\cdot$s); thus, the compute
 efficiency is defined as
 \begin{equation}
   \eta_{\mathrm{CPU}} = \frac{W_{\mathrm{CPU}}}{N_{\mathrm{cores}} \cdot
-  T_{\mathrm{run}}} \in [0,1],
+  t_{\mathrm{run}}} \in [0,1],
   \label{eq:eta}
 \end{equation}
-which equals 1 when all cores run at nominal frequency for the whole execution and
+which equals 1 when all cores run at nominal frequency for the whole execution, and
 decreases under throttling, idling, or memory contention.
 
 \paragraph{Memory-bandwidth utilization.}
@@ -423,10 +432,9 @@ BCM2712's 32-bit (4-byte) single-channel interface, giving
 \end{equation}
 and this derived value of 17.1~GByte/s is the one used throughout this work.
 MBU is then computed as
-$\mathrm{MBU} = (M_{\mathrm{model}} + M_{\mathrm{KV}}) / (\mathrm{TPOT}
-\cdot BW_{\mathrm{peak}})$, with
-$\mathrm{TPOT}$ (s/token) is the mean time per output token, and the $M$ terms
-denote the size in bytes: $M_{\mathrm{model}} = N_{\mathrm{params}}\,\mathrm{bpw}/8$
+$\mathrm{MBU} = (M_{\mathrm{model}} + M_{\mathrm{KV}})\,T / BW_{\mathrm{peak}}$,
+where $T$ is the decode throughput defined above (its inverse, $1/T$, is the
+mean time per output token) and the $M$ terms denote the size in bytes: $M_{\mathrm{model}} = N_{\mathrm{params}}\,\mathrm{bpw}/8$
 for the weights at $\mathrm{bpw}$ bits per weight, and
 $M_{\mathrm{KV}} = B_{\mathrm{prompt}} \cdot 2 \, L \, n_{\mathrm{kv}}\, d_{h}\, S\, b_{\mathrm{kv}}$
 for the KV cache, where $B_{\mathrm{prompt}}$ is the number of prompts
@@ -442,8 +450,8 @@ full KV cache per step. For architectures that diverge from this pattern we
 propose a corrected variant,
 \begin{equation}
   \mathrm{MBU}_{\mathrm{corr}} = \frac{1}{BW_{\mathrm{peak}}}\cdot
-  \frac{M_{\mathrm{model}}^{\mathrm{act}} + M_{\mathrm{KV}}^{\mathrm{attn}} +
-  M_{\mathrm{state}}}{\mathrm{TPOT}},
+  \left(M_{\mathrm{model}}^{\mathrm{act}} + M_{\mathrm{KV}}^{\mathrm{attn}} +
+  M_{\mathrm{state}}\right) T,
   \label{eq:mbu_corr}
 \end{equation}
 where the terms are again bytes per decode step:
@@ -468,7 +476,7 @@ merit.
 
 \paragraph{Figures of merit.}
 To rank configurations, we aggregate the efficiency dimensions with a
-weighted geometric mean, which drives the score to zero if any axis collapses
+weighted geometric mean $\mathrm{FoM}_{\mathrm{full}}$, which drives the score to zero if any axis collapses
 and thereby penalizes unbalanced designs. Because tokens/s and tokens/J are
 intrinsically biased toward smaller models, both axes are weighted by the
 number of active parameters $N^{\mathrm{act}}$. Each axis is normalized by a
@@ -491,8 +499,8 @@ referred, for each model, to its own CPU execution:
 \begin{equation}
   \mathrm{FoM}_{\mathrm{red}} = \sqrt{\tilde{T}_{5}\cdot\tilde{\varepsilon}_{5}},
   \qquad
-  \tilde{T}_{5} = \frac{T}{T_{\mathrm{cpu},m}},\qquad
-  \tilde{\varepsilon}_{5} = \frac{\varepsilon}{\varepsilon_{\mathrm{cpu},m}} ,
+  \tilde{T}_{5} = \frac{T}{T_{\mathrm{cpu}}},\qquad
+  \tilde{\varepsilon}_{5} = \frac{\varepsilon}{\varepsilon_{\mathrm{cpu}}} ,
   \label{eq:fom_red}
 \end{equation}
 so that $\mathrm{FoM}_{\mathrm{red}}>1$ indicates a net advantage of the
@@ -503,7 +511,7 @@ A configuration is \emph{usable} for interactive operation if its throughput
 exceeds a threshold $T_{\mathrm{hum}}$ derived from a reference reading speed
 of 3~words/s~\cite{whatmough_generative_2025} and an empirical
 tokens-per-word ratio measured on the text generated in that same series, so
-each configuration is judged against its own threshold; the applicable
+each configuration is judged against its own threshold (tok/s); the applicable
 $T_{\mathrm{hum}}$ is reported alongside the throughput in every results
 table. This criterion acts as a viability filter; that is why it is not part
 of the FoM.
@@ -539,7 +547,7 @@ structured in four layers (Pydantic data models, artifact parsers, metric
 transforms, and matplotlib visualization). It loads and validates collections of
 runs with controlled tolerance to missing data, automatically computes all derived metrics
 defined in Section~\ref{sec:metrics}, and exports stable-schema pandas
-DataFrames. The datasets generated in this study are publicly
+DataFrames. The resulting datasets generated in this study containing inference and hardware metrics alongside the metadata are publicly
 versioned,\footnote{\url{https://github.com/TFG-yisuscc/TFG-DATA}} providing
 full traceability between the results reported here and the runs that
 originated them.
@@ -555,9 +563,7 @@ providing a theoretical bandwidth of 17.1~GByte/s
 the official 27~W USB-C power supply, a 128~GByte SanDisk Extreme microSD
 card~\cite{SanDiskExtreme128}, and the
 official Active Cooler~\cite{RPiActiveCooler2024}, firmware-controlled as a
-function of SoC temperature. The OS was Raspberry~Pi~OS Lite (64-bit,
-Debian~13 based), without a graphical environment to minimize background
-interference. For series E5 the platform was extended with the Raspberry~Pi
+function of SoC temperature. For series E5 the platform was extended with the Raspberry~Pi
 AI~HAT+~2, integrating the Hailo-10H accelerator (40~TOPS INT4, 8~GByte of
 dedicated LPDDR4X)~\cite{raspberrypi_ai_hat_plus_2_product_brief}, and energy
 was measured with an external wall-power meter ($\pm2\%$ accuracy) that
@@ -565,7 +571,8 @@ captured the total system consumption, including the HAT and power-supply losses
 
 \paragraph{Software stack.}
 The OS image was Raspberry~Pi~OS Lite 64-bit \emph{Trixie} (Debian~13,
-2026-04-21 image), with PCIe~Gen~3 enabled in the firmware EEPROM for the
+2026-04-21 image),without a graphical environment to minimize background
+interference and with PCIe~Gen~3 enabled in the firmware EEPROM for the
 AI~HAT+~2. \textit{MonitorSystem} integrates llama.cpp build
 9030~\cite{gerganov_llamacpp_2023} as a statically linked library;
 Ollama~0.24.0~\cite{ollama_2023} was installed with its default server
@@ -676,21 +683,21 @@ software. Table~\ref{tab:e0} reports this characterization.
 
 \begin{table}[t]
 \centering
-\caption{Baseline characterization of the six models in the reference
+\caption{Baseline characterization (Series E0) of the six models in the reference
 configuration (Q4\_K\_M, context 4\,096, batch 512), with active cooling
 (\ding{51}) and without it (\ding{55}). $N$ is the (active) parameter
 count; the FoM is defined in Eq.~\eqref{eq:fom_full}. MBU is the corrected
 memory-bandwidth utilization defined in Eq.~\eqref{eq:mbu_corr}. \emph{Us.} marks
 usable configurations ($T \geq T_{\mathrm{hum}}$), with $T_{\mathrm{hum}}$
 computed empirically from this series' own generated text. Rows sorted by
-usability and descending FoM.}
+usability and descending FoM. Bold: best FoMfull per model.}
 \label{tab:e0}
 \renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{4.4pt}
 \footnotesize
 \begin{tabular}{l c r r r r r r r c c c}
 \toprule
-\textbf{Model} & \textbf{Fan} & \textbf{$N$} & \textbf{RAM} &
+\textbf{Model} & \textbf{Fan} & \textbf{$N_{\mathrm{act}}$} & \textbf{RAM} &
 \textbf{$T$} & \textbf{$T_{\mathrm{hum}}$} & \textbf{TTFT} & \textbf{$\varepsilon$} &
 \textbf{MBU\textsubscript{corr}} & \textbf{$\eta_{\mathrm{CPU}}$} &
 \textbf{FoM} & \textbf{Us.} \\
@@ -757,7 +764,7 @@ active cooling.}
 
 With active cooling, compute efficiency $\eta_{\mathrm{CPU}}$ is nearly
 homogeneous across models (0.95--0.99) and therefore not a discriminating
-axis; differentiation comes from corrected bandwidth utilization and weighted
+axis; differentiation comes from throughput, corrected bandwidth utilization and weighted
 energy efficiency (Figure~\ref{fig:e0_fom}). The platform operates
 memory-bound during decoding, with $\mathrm{MBU}_{\mathrm{corr}}$ between 53
 and 66\%.
@@ -806,7 +813,7 @@ strongly right-skewed, the top of the ranking depends on the statistic used
 response long, whereas the mean of the latter is driven by four out of fifteen
 prompts above 1300~s). Given that decoding dominates, any
 thermally induced frequency reduction translates proportionally into global
-throughput loss, which explains the four models that become out of the
+throughput loss (Figure~\ref{fig:e0_cooling}), which explains the four models that become out of the
 usability range under natural convection conditions (no fan).
 
 \subsection{E1: Quantization}\label{sec:results_e1}
@@ -891,12 +898,12 @@ Q3\_K\_M & 4.2 & 1.85 & 5.5 & 4.68 & 3630 & 0.697 & 67.0 &  9.13 (0.18) & 1.108 
 The most relevant result is that aggressive quantization not only
 reduces the memory footprint but \emph{improves} the FoM in every
 model: $\mathrm{FoM}_{\mathrm{full}}$ grows monotonically from Q8\_0 towards
-Q4 and Q3, peaking at Q4\_0 or Q3\_K\_M depending on the model. The cause is
+Q4 and Q3, peaking at Q4\_0 or Q3\_K\_M depending on the model (Figure~\ref{fig:e1_fom_bpw}). The cause is
 twofold: a smaller footprint reduces per-token memory traffic---the binding
 constraint on this memory-bound platform---, raising throughput and energy
 efficiency $\varepsilon$ at the same time. Conversely, Q8\_0 falls
 below the usability threshold in four of the six models, and BF16 sinks
-Llama~3.2~1B to 1.6~tok/s (Figure~\ref{fig:e1_fom_bpw}): on a memory-bound
+Llama~3.2~1B to 1.6~tok/s: On a memory-bound
 platform, excess precision is counterproductive.
 
 \begin{figure}[t]
@@ -922,7 +929,7 @@ DeepSeek-R1-1.5B (Q4\_0 and Q8\_0 collapse; see text).}
 \label{fig:e1_ppl}
 \end{figure}
 
-In the quality dimension (Figure~\ref{fig:e1_ppl}), the degradation from
+In the quality dimension (Figure~\ref{fig:e1_ppl}), the perplexity degradation from
 Q8\_0 to Q4\_K\_M is below 5\% in all models (Ministral-3B: $+1.7\%$;
 Llama-3.2-3B: $+3.2\%$; Llama-3.2-1B: $+3.5\%$; Granite: $+4.3\%$), and
 Q5\_K\_M is virtually lossless ($<1.4\%$). Q3\_K\_M introduces appreciable
