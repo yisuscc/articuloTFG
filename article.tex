@@ -40,7 +40,7 @@ Raspberry~Pi~5}
 
 \author{Jesús Carrascosa-Carro}
 \orcid{0009-0003-5972-0504}
-\email{jesuscarrascosa8@gmail.com}
+\email{jescarcar5@alum.us.es}
 \affiliation{%
   \institution{Universidad de Sevilla}
   \city{Seville}
@@ -297,34 +297,34 @@ platforms and their coverage relative to this work.}
 Velasco-Montero et al.~\cite{velasco-montero_optimal_2022,
 velasco-montero_relevant_2022}; Benoit-Cattin et
 al.~\cite{benoit-cattin_impact_2020} &
-Hardware monitoring; thermal behavior &
+Hardware resources monitoring; thermal behavior &
 SLM inference \\
 \addlinespace[2pt]
 Chen et al.\ (ELIB)~\cite{chen_inference_2025} &
 Latency; compute throughput (FLOP/s); memory-bandwidth utilization (MBU);
 generative quality (perplexity); quantization &
-Multiple engines; hardware monitoring; normalized energy (J/token); model diversity (one model) \\
+Multiple engines; hardware resources monitoring; normalized energy (J/token); model diversity (one model) \\
 \addlinespace[2pt]
 Arya and Simmhan~\cite{11105796} &
-Hardware monitoring (incl. power modes); absolute energy (J); quantization;
+Partial hardware resources monitoring (incl. power modes); absolute energy (J); quantization;
 batch size &
 Specialized engines; normalized energy (J/token) \\
 \addlinespace[2pt]
 Sobhani et al.~\cite{sobhani_sustainability_2025} &
-Hardware monitoring (power, memory); generative quality (F1);
+Partial hardware resources monitoring (power, memory); generative quality (F1);
 multiple platforms &
 Specialized engines; model diversity \\
 \addlinespace[2pt]
 Husom et al.~\cite{husom_sustainable_2025} &
 Normalized energy (J/token); generative quality (task-based);
 model diversity (28 quantized models) &
-Multiple engines (CPU only); hardware monitoring; thermal behavior \\
+Multiple engines (CPU only); hardware resources monitoring; thermal behavior \\
 \midrule
 \textbf{This work} &
 Specialized engines (llama.cpp, Ollama, hailo-ollama); commercial
 accelerator; hardware resource monitoring; normalized energy (token/J); thermal
 behavior; model diversity &
-Generative quality (task-based); multiple platforms \\
+Generative quality (task-based); multiple hardware platforms \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -935,17 +935,20 @@ Llama-3.2-3B: $+3.2\%$; Llama-3.2-1B: $+3.5\%$; Granite: $+4.3\%$), and
 Q5\_K\_M is virtually lossless ($<1.4\%$). Q3\_K\_M introduces appreciable
 degradation (8--19\% depending on the model). Notably, Q4\_0, despite
 sharing the bit level of Q4\_K\_M, degrades quality more in every model (up
-to $+13.4\%$ in Llama-3.2-1B), while offering no systematic advantage in
-throughput or energy; the choice between K and non-K families is therefore
-decisive for quality though not for performance, making K-quants preferable
-in all scenarios except under extreme load-latency constraints. These
+to $+13.4\%$ in Llama-3.2-1B), although it loads faster, with a lower TTFT
+in all models (e.g., 1164 vs.\ 1874~ms in Ministral-3B). These
 results are consistent with Kurtic et al.~\cite{kurtic_give_2025} and
 validate, in the edge-inference context, that 4-bit quantization preserves
 generative quality within operationally acceptable margins. In summary,
-Q4\_K\_M is the recommended default operating point---usable in all six
-models with low TTFT and near-baseline quality---with Q4\_0 and Q3\_K\_M as
-alternatives under stronger resource constraints (e.g., Llama-3.2-1B at Q3\_K\_M
-runs in 0.97~GByte at 11.4~tok/s).
+if only the FoM is considered, Q4\_0 and Q3\_K\_M are the best alternatives:
+Q3\_K\_M attains the highest FoM in four of the six models and Q4\_0 in
+Ministral-3B, and both outperform Q4\_K\_M in FoM in every model except
+Llama-3.2-1B (e.g., Llama-3.2-1B at Q3\_K\_M runs in 0.97~GByte at
+11.4~tok/s). However, once quality degradation is also taken into account,
+Q4\_K\_M offers the best balance: its FoM is close to the maximum, it is usable
+in all six models, and its perplexity stays within 5\% of Q8\_0, whereas Q4\_0 and
+Q3\_K\_M degrade it by up to 13\% and 19\%, respectively. Q4\_K\_M is therefore
+recommended as the default operating point.
 
 \subsection{E2: Context-Window Size}\label{sec:results_e2}
 
@@ -978,7 +981,7 @@ range, so all configurations of the series remain usable. Active cooling.}
 
 \subsection{E3: Prefill Batch Size}\label{sec:results_e3}
 
-in series E3, we varied the prefill batch size across 128--2\,048 (RQ3). The result
+In series E3, we varied the prefill batch size across 128--2\,048 (RQ3). The result
 is itself a finding: the parameter has no appreciable effect on any
 metric---RAM, throughput, TTFT, energy per token, and FoM remain constant
 within experimental noise across the whole range, refuting the working
@@ -992,7 +995,7 @@ which are outside the scope of this study.
 
 \subsection{E4: Inference Engine}\label{sec:results_e4}
 
-in series E4, we compared llama.cpp and Ollama running the same models in identical
+In series E4, we compared llama.cpp and Ollama running the same models in identical
 configurations, isolating the overhead of the runtime layer (RQ4).
 Table~\ref{tab:e4} reports the results.
 
@@ -1002,7 +1005,7 @@ Table~\ref{tab:e4} reports the results.
 Positive $\Delta$ values indicate an Ollama advantage. \emph{Us.} marks the
 usability of each engine's run (l.cpp/Ollama) against the corresponding
 per-engine threshold $T_{\mathrm{hum}}$, computed empirically from the text
-each engine generated. $^{\ddag}$~the Ollama run of DeepSeek-R1-1.5B is
+each engine generated. $^{\ddag}$~The Ollama run of DeepSeek-R1-1.5B is
 non-usable because its anomalously high tokens-per-word ratio raises its
 threshold to 13.76~tok/s, above the achieved throughput.}
 \label{tab:e4}
@@ -1102,7 +1105,7 @@ The results refute the expectation of acceleration: the Hailo-10H
 47\% in Llama-3.2-3B. The energy dimension, however, differs qualitatively
 between models. For DeepSeek-R1-1.5B the accelerator offers no appreciable
 energy advantage ($\varepsilon_{\mathrm{norm}}=1.023$), so the CPU dominates
-on both axes ($\mathrm{FoM}_{\mathrm{red}}=0.822$). For Llama-3.2-3B the
+on both axes: throughput and energy efficiency ($\mathrm{FoM}_{\mathrm{red}}=0.822$). For Llama-3.2-3B the
 energy gain is notable---57\% lower cost per token
 ($\varepsilon_{\mathrm{norm}}=2.320$)---which more than compensates the speed
 loss and raises $\mathrm{FoM}_{\mathrm{red}}$ to 1.107, above parity with the
@@ -1137,11 +1140,10 @@ reduces first-token latency without altering decoding throughput.
 \paragraph{A well-defined optimal reference configuration.}
 Active cooling, Q4\_K\_M quantization, and the llama.cpp engine constitute
 the recommended configuration for interactive deployments: it keeps all six
-models usable, minimizes TTFT, and offers the best balance between
-throughput, memory footprint, and energy cost, while degrading perplexity by
-less than 5\% with respect to Q8\_0. Q4\_0 and Q3\_K\_M can substitute
-Q4\_K\_M under severe resource constraints, with the caveat that Q4\_0 shows
-higher quality degradation at the same bit level.
+models usable and, with Q4\_K\_M, degrades perplexity by less than 5\% with
+respect to Q8\_0, offering the best balance between FoM and quality.
+Q4\_0 and Q3\_K\_M reach the highest FoM and can substitute Q4\_K\_M when
+latency or memory dominate, at the cost of higher quality degradation.
 
 \paragraph{Hardware acceleration introduces an asymmetric, model-dependent
 balance.}
@@ -1178,8 +1180,8 @@ The main conclusions are: (i)~active cooling is an enabling requirement, not
 an optimization---without it, thermal throttling collapses compute
 efficiency from ${\approx}0.97$ to ${\approx}0.40$ and renders four of six
 models non-interactive; (ii)~4-bit quantization is the optimum on this
-memory-bound platform, with Q4\_K\_M as the best default operating point in
-both performance and quality, whereas 8-bit and full-precision formats are
+memory-bound platform, with Q4\_K\_M as the best balance between FoM and
+quality (Q4\_0 and Q3\_K\_M reach a higher FoM), whereas 8-bit and full-precision formats are
 counterproductive; (iii)~context size is a fine-tuning parameter (throughput
 losses up to 22\%) and prefill batch size is irrelevant in single-stream
 inference; (iv)~llama.cpp is the preferable engine when latency matters,
