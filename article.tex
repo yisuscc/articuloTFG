@@ -389,8 +389,7 @@ Power was sampled from the internal PMIC sensor of the Raspberry~Pi~5
 (\texttt{vcgencmd pmic\_read\_adc}) at a fixed 0.25~s period for the whole
 duration of each run. Energy is obtained by integrating the sampled power over
 the measurement window, $E_{\mathrm{run}}=\sum_i P_i\,\Delta t =
-\bar{P}_{\mathrm{run}}\,t_{\mathrm{run}}$, and our conmparison metric, energy efficiency is calculated as as
-$\varepsilon = T/\bar{P}_{\mathrm{run}}$ (tokens/J); the energy per token (J/tokens) is its
+\bar{P}_{\mathrm{run}}\,t_{\mathrm{run}}$, and our comparison metric, energy efficiency is calculated as $\varepsilon = T/\bar{P}_{\mathrm{run}}$ (tokens/J); the energy per token (J/tokens) is its
 reciprocal. Phase-level quantities are likewise derived from
 the samples, by assigning each of them to the load, prefill, or decode window
 delimited by the durations reported by the engine, so that no fixed cost
@@ -571,8 +570,8 @@ captured the total system consumption, including the HAT and power-supply losses
 
 \paragraph{Software stack.}
 The OS image was Raspberry~Pi~OS Lite 64-bit \emph{Trixie} (Debian~13,
-2026-04-21 image),without a graphical environment to minimize background
-interference and with PCIe~Gen~3 enabled in the firmware EEPROM for the
+2026-04-21 image), without a graphical environment to minimize background
+interference, and with PCIe~Gen~3 enabled in the firmware EEPROM for the
 AI~HAT+~2. \textit{MonitorSystem} integrates llama.cpp build
 9030~\cite{gerganov_llamacpp_2023} as a statically linked library;
 Ollama~0.24.0~\cite{ollama_2023} was installed with its default server
@@ -690,17 +689,17 @@ count; the FoM is defined in Eq.~\eqref{eq:fom_full}. MBU is the corrected
 memory-bandwidth utilization defined in Eq.~\eqref{eq:mbu_corr}. \emph{Us.} marks
 usable configurations ($T \geq T_{\mathrm{hum}}$), with $T_{\mathrm{hum}}$
 computed empirically from this series' own generated text. Rows sorted by
-usability and descending FoM. Bold: best FoMfull per model.}
+usability and descending FoM. Bold: best $\mathrm{FoM}_{\mathrm{full}}$ per model.}
 \label{tab:e0}
 \renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{4.4pt}
 \footnotesize
 \begin{tabular}{l c r r r r r r r c c c}
 \toprule
-\textbf{Model} & \textbf{Fan} & \textbf{$N_{\mathrm{act}}$} & \textbf{RAM} &
+\textbf{Model} & \textbf{Fan} & \textbf{$N^{\mathrm{act}}$} & \textbf{RAM} &
 \textbf{$T$} & \textbf{$T_{\mathrm{hum}}$} & \textbf{TTFT} & \textbf{$\varepsilon$} &
 \textbf{MBU\textsubscript{corr}} & \textbf{$\eta_{\mathrm{CPU}}$} &
-\textbf{FoM} & \textbf{Us.} \\
+\textbf{$\mathrm{FoM}_{\mathrm{full}}$} & \textbf{Us.} \\
  & & (B) & (GByte) & (tok/s) & (tok/s) & (ms) & (tok/J) & (\%) & & & \\
 \midrule
 \multicolumn{12}{l}{\textit{Active cooling (fan)}}\\
@@ -903,7 +902,7 @@ twofold: a smaller footprint reduces per-token memory traffic---the binding
 constraint on this memory-bound platform---, raising throughput and energy
 efficiency $\varepsilon$ at the same time. Conversely, Q8\_0 falls
 below the usability threshold in four of the six models, and BF16 sinks
-Llama~3.2~1B to 1.6~tok/s: On a memory-bound
+Llama~3.2~1B to 1.6~tok/s. On a memory-bound
 platform, excess precision is counterproductive.
 
 \begin{figure}[t]
@@ -1020,7 +1019,7 @@ threshold to 13.76~tok/s, above the achieved throughput.}
 \textbf{$\Delta$\%} & \textbf{$\Delta$\%} & \textbf{Us.} \\
 \cmidrule(lr){2-3}\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-10}
 \textbf{Model} & l.cpp & Oll. & \textbf{l.cpp/Oll.} & l.cpp & Oll. & l.cpp & Oll. & l.cpp & Oll. &
-\textbf{$T$} & \textbf{FoM} & \textbf{l.cpp/Oll.} \\
+\textbf{$T$} & \textbf{$\mathrm{FoM}_{\mathrm{full}}$} & \textbf{l.cpp/Oll.} \\
 \midrule
 DeepSeek-R1-1.5B & 8.98  & 9.49 & 3.69/13.76 & 951  & 3111  & 1.251 & 1.337 & 1.025 & 1.035 & $+5.7$  & $+1.0$  & \ding{51}/\ding{55}$^{\ddag}$ \\
 Llama-3.2-1B     & 11.23 & 11.16& 4.42/4.11 & 673  & 2552  & 1.733 & 1.623 & 0.961 & 0.906 & $-0.6$  & $-5.7$  & \ding{51}/\ding{51} \\
