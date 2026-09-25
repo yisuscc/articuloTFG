@@ -1151,17 +1151,16 @@ advantage to compensate the speed penalty.
 The results from the six series converge on a coherent picture articulated around the three
 transversal axes elaborated next. 
 
-\paragraph{Memory bandwidth is the dominant limiting factor.}% rewrite and reprhase w/o memory-bound
-The target platform operates during decoding, with an
-$\mathrm{MBU}_{\mathrm{corr}}$ between 53 and 66\% in nominal conditions.
-This single bottleneck explains four series: in E1, throughput rises
-as weight precision drops from 8 to ${\approx}4$~bpw, because lighter weights
-move less memory per token, and the gain levels off below Q5\_K\_M in
-Llama-3.2-1B; in E2, larger context windows increase KV-cache traffic
-and degrade throughput by up to 22\% in the models with the highest MBU; in
-E3, prefill batch size is irrelevant because single-stream decoding finds no
-additional parallelism; and in E4, llama.cpp's serverless architecture
-reduces first-token latency without altering decoding throughput.
+\paragraph{Decoding regime and memory bandwidth utilization.}% rewrite and reprhase w/o memory-bound
+Under nominal decoding conditions (E0 with fan), the target platform exhibits an
+$\mathrm{MBU}_{\mathrm{corr}}$ between 53 and 66\%. Separately, four experimental
+series characterize the system dynamics: in E1, throughput rises as weight
+precision drops from 8 to ${\approx}4$~bpw, because lighter weights move less data
+per token, leveling off below Q5\_K\_M in Llama-3.2-1B; in E2, larger context
+windows increase KV-cache traffic and degrade throughput by up to 22\% in the
+largest models; in E3, prefill batch size is irrelevant because single-stream
+decoding finds no additional parallelism; and in E4, llama.cpp's serverless
+architecture reduces first-token latency without altering decoding throughput.
 
 \paragraph{A well-defined optimal reference configuration.}
 Active cooling, Q4\_K\_M quantization, and the llama.cpp engine constitute
