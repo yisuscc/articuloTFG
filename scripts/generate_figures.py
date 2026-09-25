@@ -26,6 +26,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib.ticker import LogLocator, NullFormatter
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -274,6 +275,11 @@ for ax, phases, subtitle in [
     (axes[1], PHASES_TOTAL, "(b) Total per run"),
 ]:
     ax.set_xscale("log")
+    # force one major tick per decade plus minor ticks so both panels keep the
+    # same grid (auto locator drops minor ticks once the span exceeds ~9 decades)
+    ax.xaxis.set_major_locator(LogLocator(base=10, numticks=20))
+    ax.xaxis.set_minor_locator(LogLocator(base=10, subs=np.arange(2, 10), numticks=20))
+    ax.xaxis.set_minor_formatter(NullFormatter())
     yticks, ylabels = [], []
     for mi, model in enumerate(models_ph):
         y_group = mi * STEP
@@ -509,5 +515,60 @@ labels.append("$T_{hum}$ (per model)")
 ax.legend(handles, labels, bbox_to_anchor=(1.02, 1), loc="upper left", fontsize=9)
 fig.tight_layout()
 save(fig, "e2_throughput.png")
+
+# ---------------------------------------------------------------------------
+# Figure 8 — E2 runtime RAM footprint vs context size
+# ---------------------------------------------------------------------------
+
+hw2 = coll2.hw_metrics_df()
+ram2 = hw2.groupby("run_id")["mem_used_bytes"].mean().reset_index()
+ram2["ram_used_gb"] = ram2["mem_used_bytes"] / 1e9
+ex_r = ex2.merge(ram2[["run_id", "ram_used_gb"]], on="run_id", how="left")
+ex_r = ex_r.dropna(subset=["context_size", "ram_used_gb"]).sort_values("context_size")
+
+fig, ax = plt.subplots(figsize=(9, 5))
+for i, m in enumerate(sorted(ex_r["model_clean"].unique())):
+    sub = ex_r[ex_r["model_clean"] == m]
+    ax.plot(sub["context_size"], sub["ram_used_gb"],
+            marker=MARKER_POOL[i % len(MARKER_POOL)], lw=2, ms=8, label=m)
+ax.set_xlabel("Context size (tokens)", fontsize=11)
+ax.set_ylabel("Runtime RAM footprint (GBytes)", fontsize=11)
+ax.grid(True, alpha=0.3)
+ax.legend(bbox_to_anchor=(1.02, 1), loc="upper left", fontsize=9)
+fig.tight_layout()
+save(fig, "e2_ram.png")
+
+# report the growth quoted in the text
+for m, sub in ex_r.groupby("model_clean"):
+    sub = sub.sort_values("context_size")
+    lo, hi = sub["ram_used_gb"].iloc[0], sub["ram_used_gb"].iloc[-1]
+    print(f"  RAM {m}: {lo:.2f} -> {hi:.2f} GBytes ({(hi - lo) / lo * 100:+.0f}%)")
+
+# ---------------------------------------------------------------------------
+# Figure 9 — E2 FoM_full vs context size
+# ---------------------------------------------------------------------------
+
+if "model_clean" not in fom2.columns:
+    fom2["model_clean"] = fom2["model_label"].map(clean_label)
+ex_f = fom2.dropna(subset=["context_size", "fom_full"]).sort_values("context_size")
+
+fig, ax = plt.subplots(figsize=(9, 5))
+for i, m in enumerate(sorted(ex_f["model_clean"].unique())):
+    sub = ex_f[ex_f["model_clean"] == m]
+    ax.plot(sub["context_size"], sub["fom_full"],
+            marker=MARKER_POOL[i % len(MARKER_POOL)], lw=2, ms=8, label=m)
+ax.axhline(1.0, color="gray", ls="--", lw=1.2, alpha=0.7, label="Reference (FoM = 1)")
+ax.set_xlabel("Context size (tokens)", fontsize=11)
+ax.set_ylabel("$FoM_{full}$ (normalized to reference)", fontsize=11)
+ax.grid(True, alpha=0.3)
+ax.legend(bbox_to_anchor=(1.02, 1), loc="upper left", fontsize=9)
+fig.tight_layout()
+save(fig, "e2_fom.png")
+
+# report the FoM range quoted in the text
+for m, sub in ex_f.groupby("model_clean"):
+    sub = sub.sort_values("context_size")
+    lo, hi = sub["fom_full"].iloc[0], sub["fom_full"].iloc[-1]
+    print(f"  FoM {m}: {lo:.3f} -> {hi:.3f} ({(hi - lo) / lo * 100:+.0f}%)")
 
 print("All figures generated.")

@@ -81,8 +81,8 @@ experimental series (E0--E5) to evaluate six SLMs in terms of baseline operation
 quantization level, context-window size, prefill batch size,
 inference engine, and the impact on performance of the Hailo-10H accelerator (Raspberry~Pi AI~HAT+~2). 
 The results show that active cooling is an enabling requirement: its removal reduces throughput
-by up to 53\% and renders four of the six models non-interactive. We also found that four-bit
-quantization is the optimal trade-off for the Raspberry Pi 5, which is a memory-bandwidth-bound platform. 
+by up to 53\% and renders four of the six models non-interactive. We also found that 4-bit
+quantization is the optimal trade-off for the Raspberry Pi 5.
 This quantization degrades perplexity by less than 5\%, whereas 8-bit and full-precision
 formats are counterproductive. Context-window and prefill batch sizes have
 negligible impact in single-stream scenarios. Moreover, llama.cpp outperforms Ollama in
@@ -197,7 +197,7 @@ contributions of this study are:
     (Section~\ref{sec:results}).
   \item \textbf{Actionable deployment guidance.} Active cooling is an
     enabling requirement rather than an optimization; 4-bit quantization is
-    the optimum on this memory-bound platform, with quality degradation below
+    the optimum, with quality degradation below
     5\%; context and prefill batch sizes are fine-tuning parameters at most;
     llama.cpp dominates Ollama in first-token latency by up to $6\times$; and
     the Hailo-10H accelerator trades 34--47\% of throughput for a 57\%
@@ -221,11 +221,11 @@ Section~\ref{sec:conclusions} concludes and outlines future work.
 
 Autoregressive Transformer inference proceeds in two phases with distinct
 hardware profiles: a \emph{prefill} phase that processes the prompt in
-parallel and is typically compute-bound, and a \emph{decode} phase that
-generates one token at a time and is typically bound by memory bandwidth,
+parallel and is theoretically compute-bound, and a \emph{decode} phase that
+generates one token at a time and is theoretically bound by memory bandwidth,
 given that every step must stream the model weights and the growing key--value (KV)
-cache through the memory hierarchy. On embedded system-on-chips (SoCs) with narrow memory
-interfaces, this second regime dominates, which makes weight compression the
+cache through the memory hierarchy~\cite{whatmough_generative_2025}.
+ On inference, this second regime dominates in temporal extension~\cite{li_large_2025}, which makes weight compression the
 principal optimization lever. Post-training quantization to formats between 3
 and 8 bits per weight (bpw), as popularized by the GGUF ecosystem of
 llama.cpp~\cite{gerganov_llamacpp_2023,ggml-org_gguf}, reduces both the
@@ -256,7 +256,7 @@ thermal throttling appears within seconds under sustained load, making
 thermal control a prerequisite for reproducible experiments---a finding our
 E0 series confirms and quantifies for generative workloads. More recently,
 Dangwal et al.~\cite{dangwal_reliable_2026} likewise treat frequency
-throttling as a first-order factor in edge deployments, although theirs is
+throttling as a first-order factor in edge deployments, although in their case, it is
 induced by undervoltage on shared power supplies rather than by temperature;
 they show that explicitly modeling this variability, rather than attempting to
 eliminate it, provides a practical and robust foundation for performance
@@ -332,9 +332,7 @@ Generative quality (task-based); multiple hardware platforms \\
 As Table~\ref{tab:related} highlights, no prior study
 simultaneously integrates specialized inference engines, exhaustive hardware
 monitoring (including temperature and frequency), normalized energy
-evaluation, and commercial accelerators. Moreover, none characterizes the temporal and
-energy cost of the model-loading phase, which is relevant for load-on-demand
-strategies on memory-constrained devices. This work addresses this gap with
+evaluation, and commercial accelerators. This work addresses this gap with
 a unified, reproducible experimental framework.
 
 % =====================================================================
@@ -389,12 +387,11 @@ Power was sampled from the internal PMIC sensor of the Raspberry~Pi~5
 (\texttt{vcgencmd pmic\_read\_adc}) at a fixed 0.25~s period for the whole
 duration of each run. Energy is obtained by integrating the sampled power over
 the measurement window, $E_{\mathrm{run}}=\sum_i P_i\,\Delta t =
-\bar{P}_{\mathrm{run}}\,t_{\mathrm{run}}$, and our comparison metric, energy efficiency is calculated as $\varepsilon = T/\bar{P}_{\mathrm{run}}$ (tokens/J); the energy per token (J/tokens) is its
+\bar{P}_{\mathrm{run}}\,t_{\mathrm{run}}$, and our comparison metric, energy efficiency, is calculated as $\varepsilon = T/\bar{P}_{\mathrm{run}}$ (tokens/J); the energy per token (J/tokens) is its
 reciprocal. Phase-level quantities are likewise derived from
 the samples, by assigning each of them to the load, prefill, or decode window
 delimited by the durations reported by the engine, so that no fixed cost
-distribution across phases is assumed. That
-sensor also excludes the cooler and USB peripherals, so E0--E4 values are lower
+distribution across phases is assumed. The aforementioned PMIC also excludes the cooler and USB peripherals, so E0--E4 values are lower
 bounds; for series E5, we used an external wall-power meter instead
 (Section~\ref{sec:results_e5}).
 
@@ -407,7 +404,7 @@ thermal throttling, we define the effective CPU work as
 \end{equation}
 where $f(t)$ is the instantaneous frequency, $f_{\mathrm{nom}}=2.4$~GHz,
 $U(t)$ denotes the aggregate CPU usage (\%), and $N_{\mathrm{cores}}=4$, so
-$W_{\mathrm{CPU}}$ is in nominal core-seconds (core$\cdot$s); thus, the compute
+$W_{\mathrm{CPU}}$ is expressed in nominal core-seconds (core$\cdot$s); thus, the compute
 efficiency is defined as
 \begin{equation}
   \eta_{\mathrm{CPU}} = \frac{W_{\mathrm{CPU}}}{N_{\mathrm{cores}} \cdot
@@ -533,7 +530,7 @@ Each run produces three data structures---per-prompt inference metrics (JSONL),
 periodic hardware samples (JSONL), and a summary with the full configuration
 and model metadata (JSON)---in a directory marked by a nanosecond timestamp.
 Reproducibility is guaranteed by pinning the random seed and sampling temperature:
-under identical hardware and model versions, outputs are deterministic.
+under identical hardware,engine, and model versions, outputs are deterministic.
 Google Research's full \textit{instruction\_following\_eval}
 dataset~\cite{zhou_instruction-following_2023} is embedded in the binary at
 compile time, eliminating external file dependencies at run time, though
@@ -676,7 +673,7 @@ E5 & RQ5 & Accelerator & CPU (llama.cpp) vs.\ Hailo-10H (hailo-ollama) & 2 \\
 
 Series E0 establishes the baseline behavior of the six models in the
 reference configuration, with six runs under active cooling and six under
-natural convection (RQ1, RQ6); for the natural-convection condition the
+natural convection (RQ1, RQ6); for the natural-convection condition, the
 Active Cooler was physically removed from the board, not merely disabled in
 software. Table~\ref{tab:e0} reports this characterization.
 
@@ -685,16 +682,16 @@ software. Table~\ref{tab:e0} reports this characterization.
 \caption{Baseline characterization (Series E0) of the six models in the reference
 configuration (Q4\_K\_M, context 4\,096, batch 512), with active cooling
 (\ding{51}) and without it (\ding{55}). $N$ is the (active) parameter
-count; the FoM is defined in Eq.~\eqref{eq:fom_full}. MBU is the corrected
+count; the $\mathrm{FoM}_{\mathrm{full}}$ is defined in Eq.~\eqref{eq:fom_full}. MBU is the corrected
 memory-bandwidth utilization defined in Eq.~\eqref{eq:mbu_corr}. \emph{Us.} marks
 usable configurations ($T \geq T_{\mathrm{hum}}$), with $T_{\mathrm{hum}}$
 computed empirically from this series' own generated text. Rows sorted by
-usability and descending FoM. Bold: best $\mathrm{FoM}_{\mathrm{full}}$ per model.}
+descending $\mathrm{FoM}_{\mathrm{full}}$ within each cooling condition.}
 \label{tab:e0}
 \renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{4.4pt}
 \footnotesize
-\begin{tabular}{l c r r r r r r r c c c}
+\begin{tabular}{l c c c c c c c c c c c}
 \toprule
 \textbf{Model} & \textbf{Fan} & \textbf{$N^{\mathrm{act}}$} & \textbf{RAM} &
 \textbf{$T$} & \textbf{$T_{\mathrm{hum}}$} & \textbf{TTFT} & \textbf{$\varepsilon$} &
@@ -704,7 +701,7 @@ usability and descending FoM. Bold: best $\mathrm{FoM}_{\mathrm{full}}$ per mode
 \midrule
 \multicolumn{12}{l}{\textit{Active cooling (fan)}}\\
 \midrule
-Ministral~3B & \ding{51} & 3.43 & 3.01 & 4.7 & 4.52 & 1929 & 0.694 & 66.1 & 0.980 & \textbf{1.058} & \ding{51} \\
+Ministral~3B & \ding{51} & 3.43 & 3.01 & 4.7 & 4.52 & 1929 & 0.694 & 66.1 & 0.980 & 1.058 & \ding{51} \\
 DeepSeek-R1~1.5B & \ding{51} & 1.78 & 1.51 & 9.0 & 3.69 & 951  & 1.251 & 63.7 & 0.975 & 1.025 & \ding{51} \\
 Llama~3.2~3B (ref.) & \ding{51} & 3.21 & 2.91 & 4.6 & 4.25 & 1941 & 0.681 & 62.5 & 0.987 & 1.000 & \ding{51} \\
 Llama~3.2~1B & \ding{51} & 1.24 & 1.36 & 11.2 & 4.42 & 673  & 1.733 & 58.8 & 0.975 & 0.961 & \ding{51} \\
@@ -713,18 +710,18 @@ Gemma~3n & \ding{51} & 1.91 & 2.16 & 5.7 & 4.45 & 2613 & 0.824 & 55.5 & 0.946 & 
 \midrule
 \multicolumn{12}{l}{\textit{Natural convection (no fan)}}\\
 \midrule
-Llama~3.2~1B & \ding{55} & 1.24 & 1.36 & 7.2 & 4.42 & 1214 & 1.529 & 37.3 & 0.440 & 0.610 & \ding{51} \\
-DeepSeek-R1~1.5B & \ding{55} & 1.78 & 1.51 & 4.2 & 3.69 & 2391 & 0.886 & 30.4 & 0.337 & 0.497 & \ding{51} \\
 Ministral~3B & \ding{55} & 3.43 & 3.01 & 2.7 & 4.52 & 3703 & 0.560 & 38.0 & 0.429 & 0.618 & \ding{55} \\
+Llama~3.2~1B & \ding{55} & 1.24 & 1.36 & 7.2 & 4.42 & 1214 & 1.529 & 37.3 & 0.440 & 0.610 & \ding{51} \\
 Granite~4.0-H-Micro & \ding{55} & 3.19 & 2.46 & 2.9 & 3.99 & 4227 & 0.581 & 34.3 & 0.422 & 0.593 & \ding{55} \\
 Llama~3.2~3B (ref.) & \ding{55} & 3.21 & 2.91 & 2.6 & 4.25 & 3718 & 0.538 & 36.2 & 0.446 & 0.585 & \ding{55} \\
+DeepSeek-R1~1.5B & \ding{55} & 1.78 & 1.51 & 4.2 & 3.69 & 2391 & 0.886 & 30.4 & 0.337 & 0.497 & \ding{51} \\
 Gemma~3n & \ding{55} & 1.91 & 2.16 & 3.1 & 4.45 & 5165 & 0.642 & 29.6 & 0.402 & 0.455 & \ding{55} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Under active cooling all six models exceed their respectives $T_{\mathrm{hum}}$
-threshold. The FoM places Ministral~3B first
+threshold. The $\mathrm{FoM}_{\mathrm{full}}$ places Ministral~3B first
 ($\mathrm{FoM}_{\mathrm{full}}=1.058$), closely followed by the
 DeepSeek-R1~1.5B distillate (1.025) and the Llama~3.2~3B reference (1.000 by
 definition). The tight grouping at the top indicates that no model dominates
@@ -735,9 +732,9 @@ TTFT (951~ms), the second-highest energy efficiency (1.25~tok/J), and a 1.51~GBy
 footprint; Llama~3.2~1B leads in raw speed (11.2~tok/s) with the smallest
 footprint (1.36~GByte). Figure~\ref{fig:e0_pareto} shows the compact models
 dominating the upper-left region of the throughput--footprint Pareto
-frontier, while the bubble sizes qualify the reading: Ministral~3B, despite
+frontier; the marker size is proportional to $\mathrm{FoM}_\mathrm{full}$. Ministral~3B, despite
 presenting the lowest speed among usable leaders and the largest footprint (3.01~GByte),
-attains the highest FoM once size-weighted efficiency is accounted for.
+attains the highest $\mathrm{FoM}_\mathrm{full}$ as a result of the intrinsic weighting encoded by this figure of merit, in terms of the number of active parameters.
 
 \begin{figure}[t]
 \centering
@@ -765,7 +762,7 @@ With active cooling, compute efficiency $\eta_{\mathrm{CPU}}$ is nearly
 homogeneous across models (0.95--0.99) and therefore not a discriminating
 axis; differentiation comes from throughput, corrected bandwidth utilization and weighted
 energy efficiency (Figure~\ref{fig:e0_fom}). The platform operates
-memory-bound during decoding, with $\mathrm{MBU}_{\mathrm{corr}}$ between 53
+during decoding with an $\mathrm{MBU}_{\mathrm{corr}}$ between 53
 and 66\%.
 
 \begin{figure}[t]
@@ -804,13 +801,13 @@ decoding concentrates virtually the entire inference cost: model loading is
 negligible in steady operation (0.06--0.29~s per prompt, supporting a
 keep-resident strategy), prefill accounts for a small and stable fraction
 (0.6--2.3~s per prompt), and decoding dominates (85--460~s per prompt, the
-maximum corresponding to Llama~3.2~3B, the largest model of the set). All
-per-phase values are means over prompts; since these distributions are
-strongly right-skewed, the top of the ranking depends on the statistic used
-(by median, the highest decode cost is that of DeepSeek-R1, 496~s versus
-133~s for Llama~3.2~3B: the reasoning traces of the former make nearly every
-response long, whereas the mean of the latter is driven by four out of fifteen
-prompts above 1300~s). Given that decoding dominates, any
+maximum corresponding to Llama~3.2~3B, the largest model of the set).
+Values reported per phase correspond to per-prompt averages.
+ Given the pronounced right skew of these distributions, 
+ the relative ranking of models varies with the statistic chosen:
+under the median, DeepSeek-R1 exhibits the highest decoding cost (496~s, versus 133~s for Llama~3.2~3B),
+a consequence of its reasoning traces lengthening nearly every output. By contrast, Llama~3.2~3B's mean is disproportionately 
+shaped by just four of its fifteen prompts exceeding 1300~s. Given that decoding dominates, any
 thermally induced frequency reduction translates proportionally into global
 throughput loss (Figure~\ref{fig:e0_cooling}), which explains the four models that become out of the
 usability range under natural convection conditions (no fan).
@@ -841,7 +838,7 @@ configuration ($T<T_{\mathrm{hum}}$).}
 \renewcommand{\arraystretch}{1.02}
 \setlength{\tabcolsep}{4.5pt}
 \footnotesize
-\begin{tabular}{@{}llrrrrrrlrc@{}}
+\begin{tabular}{@{}lcccccccccc@{}}
 \toprule
 \textbf{Quant.} & \textbf{BPW} &
 \textbf{RAM} & \textbf{$T$} & \textbf{$T_{\mathrm{hum}}$} &
@@ -895,22 +892,20 @@ Q3\_K\_M & 4.2 & 1.85 & 5.5 & 4.68 & 3630 & 0.697 & 67.0 &  9.13 (0.18) & 1.108 
 \end{table}
 
 The most relevant result is that aggressive quantization not only
-reduces the memory footprint but \emph{improves} the FoM in every
+reduces the memory footprint but \emph{improves} the $\mathrm{FoM}_{\mathrm{full}}$ in every
 model: $\mathrm{FoM}_{\mathrm{full}}$ grows monotonically from Q8\_0 towards
 Q4 and Q3, peaking at Q4\_0 or Q3\_K\_M depending on the model (Figure~\ref{fig:e1_fom_bpw}). The cause is
-twofold: a smaller footprint reduces per-token memory traffic---the binding
-constraint on this memory-bound platform---, raising throughput and energy
+twofold: a smaller footprint reduces per-token memory traffic, raising throughput and energy
 efficiency $\varepsilon$ at the same time. Conversely, Q8\_0 falls
 below the usability threshold in four of the six models, and BF16 sinks
-Llama~3.2~1B to 1.6~tok/s. On a memory-bound
-platform, excess precision is counterproductive.
+Llama~3.2~1B to 1.6~tok/s. Excess precision is therefore counterproductive.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.85\linewidth]{figures/e1_fom_bpw.png}
 \caption{$\mathrm{FoM}_{\mathrm{full}}$ as a function of bits per weight
 (bpw), one line per model; precision decreases from left to right. The dashed
-horizontal line marks the reference level ($\mathrm{FoM}=1$); stars mark
+horizontal line marks the reference level ($\mathrm{FoM}_{\mathrm{full}}=1$); stars mark
 usable configurations ($T \geq T_{\mathrm{hum}}$, Table~\ref{tab:models}).
 Reference configuration,
 active cooling.}
@@ -939,12 +934,12 @@ in all models (e.g., 1164 vs.\ 1874~ms in Ministral-3B). These
 results are consistent with Kurtic et al.~\cite{kurtic_give_2025} and
 validate, in the edge-inference context, that 4-bit quantization preserves
 generative quality within operationally acceptable margins. In summary,
-if only the FoM is considered, Q4\_0 and Q3\_K\_M are the best alternatives:
-Q3\_K\_M attains the highest FoM in four of the six models and Q4\_0 in
-Ministral-3B, and both outperform Q4\_K\_M in FoM in every model except
+if only the $\mathrm{FoM}_{\mathrm{full}}$ is considered, Q4\_0 and Q3\_K\_M are the best alternatives:
+Q3\_K\_M attains the highest $\mathrm{FoM}_{\mathrm{full}}$ in four of the six models and Q4\_0 in
+Ministral-3B, and both outperform Q4\_K\_M in $\mathrm{FoM}_{\mathrm{full}}$ in every model except
 Llama-3.2-1B (e.g., Llama-3.2-1B at Q3\_K\_M runs in 0.97~GByte at
 11.4~tok/s). However, once quality degradation is also taken into account,
-Q4\_K\_M offers the best balance: its FoM is close to the maximum, it is usable
+Q4\_K\_M offers the best balance: its $\mathrm{FoM}_{\mathrm{full}}$ is close to the maximum, it is usable
 in all six models, and its perplexity stays within 5\% of Q8\_0, whereas Q4\_0 and
 Q3\_K\_M degrade it by up to 13\% and 19\%, respectively. Q4\_K\_M is therefore
 recommended as the default operating point.
@@ -955,7 +950,8 @@ In series E2, we varied the context window across 512--5\,120~tokens (RQ3). Thre
 practical observations emerge. First, the RAM footprint grows smoothly and
 predictably with context, reflecting the KV-cache cost: between $+2\%$
 (Granite, whose fixed-size SSM state requires no growing KV cache) and
-$+21\%$ (Llama~3.2~3B) over the full range, never exceeding 3.2~GByte---context
+$+21\%$ (Llama~3.2~3B) over the full range (Figure~\ref{fig:e2_ram}), never
+exceeding 3.2~GByte---context
 is not a memory-pressure factor against the platform's 8~GByte RAM. Second, TTFT
 remains essentially flat: reserving a larger window does not increase
 prefill cost while the prompt does not fill it. Third, throughput decreases
@@ -963,10 +959,27 @@ smoothly and monotonically with context
 (Figure~\ref{fig:e2_throughput}), with losses up to 22\% in the models with
 the highest bandwidth utilization (DeepSeek $-22\%$, Llama-3.2-1B $-18\%$):
 the closer a model is to saturating memory bandwidth, the more sensitive it
-is to the growing per-token KV-cache traffic. Gemma~3n and Granite, with MBU
-below 55\%, are practically insensitive. No model crosses the usability
-threshold within the range. The practical recommendation is to size the
+is to the growing per-token KV-cache traffic. Gemma~3n and Granite, whose MBU
+stays close to or below ${\approx}55\%$ across the range, are practically
+insensitive. No model crosses the usability
+threshold within the range. The composite figure of merit follows the same
+pattern (Figure~\ref{fig:e2_fom}): it falls progressively in the
+bandwidth-bound models---DeepSeek from 1.164 to 1.002 ($-14\%$) and
+Llama-3.2-3B from 1.070 to 0.983 ($-8\%$)---while Gemma~3n and Granite stay
+flat, confirming that around ${\approx}55\%$ MBU the context ceases to be the
+limiting factor. The practical recommendation is to size the
 context to the smallest value that covers the application's needs.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/e2_ram.png}
+\caption{Measured runtime RAM footprint versus context-window size, one line
+per model. The slope reflects the KV-cache contribution: standard-attention
+models grow by 8--21\% across the range, while the hybrid SSM of Granite, whose
+state is fixed-size, stays flat ($+2\%$). No configuration approaches the
+platform's 8~GByte limit. Active cooling.}
+\label{fig:e2_ram}
+\end{figure}
 
 \begin{figure}[t]
 \centering
@@ -978,11 +991,21 @@ range, so all configurations of the series remain usable. Active cooling.}
 \label{fig:e2_throughput}
 \end{figure}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/e2_fom.png}
+\caption{$\mathrm{FoM}_{\mathrm{full}}$ versus context-window size, one line
+per model. The dashed line marks the reference value $\mathrm{FoM}=1$. Models
+with high bandwidth utilization lose up to 14\% across the range, whereas
+Gemma~3n and Granite are essentially insensitive. Active cooling.}
+\label{fig:e2_fom}
+\end{figure}
+
 \subsection{E3: Prefill Batch Size}\label{sec:results_e3}
 
 In series E3, we varied the prefill batch size across 128--2\,048 (RQ3). The result
 is itself a finding: the parameter has no appreciable effect on any
-metric---RAM, throughput, TTFT, energy per token, and FoM remain constant
+metric---RAM, throughput, TTFT, energy per token, and $\mathrm{FoM}_{\mathrm{full}}$ remain constant
 within experimental noise across the whole range, refuting the working
 hypothesis that larger batches would raise throughput by exploiting the four
 cores. The explanation is direct: in single-stream conversational inference
@@ -1001,7 +1024,7 @@ Table~\ref{tab:e4} reports the results.
 \begin{table}[!t]
 \centering
 \caption{llama.cpp (l.cpp) versus Ollama per model, with active cooling.
-Positive $\Delta$ values indicate an Ollama advantage. \emph{Us.} marks the
+Positive $\Delta$ values indicate a llama.cpp advantage and negative values an Ollama advantage. \emph{Us.} marks the
 usability of each engine's run (l.cpp/Ollama) against the corresponding
 per-engine threshold $T_{\mathrm{hum}}$, computed empirically from the text
 each engine generated. $^{\ddag}$~The Ollama run of DeepSeek-R1-1.5B is
@@ -1015,25 +1038,25 @@ threshold to 13.76~tok/s, above the achieved throughput.}
 \toprule
 & \multicolumn{2}{c}{\textbf{$T$ (tok/s)}} & \textbf{$T_{\mathrm{hum}}$} &
 \multicolumn{2}{c}{\textbf{TTFT (ms)}} &
-\multicolumn{2}{c}{\textbf{$\varepsilon$ (tok/J)}} & \multicolumn{2}{c}{\textbf{FoM}} &
+\multicolumn{2}{c}{\textbf{$\varepsilon$ (tok/J)}} & \multicolumn{2}{c}{\textbf{$\mathrm{FoM}_{\mathrm{full}}$}} &
 \textbf{$\Delta$\%} & \textbf{$\Delta$\%} & \textbf{Us.} \\
 \cmidrule(lr){2-3}\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-10}
 \textbf{Model} & l.cpp & Oll. & \textbf{l.cpp/Oll.} & l.cpp & Oll. & l.cpp & Oll. & l.cpp & Oll. &
 \textbf{$T$} & \textbf{$\mathrm{FoM}_{\mathrm{full}}$} & \textbf{l.cpp/Oll.} \\
 \midrule
-DeepSeek-R1-1.5B & 8.98  & 9.49 & 3.69/13.76 & 951  & 3111  & 1.251 & 1.337 & 1.025 & 1.035 & $+5.7$  & $+1.0$  & \ding{51}/\ding{55}$^{\ddag}$ \\
-Llama-3.2-1B     & 11.23 & 11.16& 4.42/4.11 & 673  & 2552  & 1.733 & 1.623 & 0.961 & 0.906 & $-0.6$  & $-5.7$  & \ding{51}/\ding{51} \\
-Llama-3.2-3B     & 4.61  & 5.08 & 4.25/4.22 & 1941 & 6563  & 0.681 & 0.669 & 1.000 & 1.030 & $+10.3$ & $+3.0$  & \ding{51}/\ding{51} \\
-Gemma-3n         & 5.68  & 5.54 & 4.45/4.44 & 2613 & 7236  & 0.824 & 0.797 & 0.818 & 0.751 & $-2.5$  & $-8.2$  & \ding{51}/\ding{51} \\
-Granite-4.0-H    & 4.41  & 4.32 & 3.99/3.92 & 2348 & 9932  & 0.658 & 0.592 & 0.934 & 0.883 & $-2.0$  & $-5.4$  & \ding{51}/\ding{51} \\
-Ministral-3B     & 4.73  & 3.55 & 4.52/4.57 & 1929 & 12848 & 0.694 & 0.497 & 1.058 & 0.826 & $-25.0$ & $-21.9$ & \ding{51}/\ding{55} \\
+DeepSeek-R1-1.5B & 8.98  & 9.49 & 3.69/13.76 & 951  & 3111  & 1.251 & 1.337 & 1.025 & 1.035 & $-5.7$  & $-1.0$  & \ding{51}/\ding{55}$^{\ddag}$ \\
+Llama-3.2-1B     & 11.23 & 11.16& 4.42/4.11 & 673  & 2552  & 1.733 & 1.623 & 0.961 & 0.906 & $+0.6$  & $+5.7$  & \ding{51}/\ding{51} \\
+Llama-3.2-3B     & 4.61  & 5.08 & 4.25/4.22 & 1941 & 6563  & 0.681 & 0.669 & 1.000 & 1.030 & $-10.3$ & $-3.0$  & \ding{51}/\ding{51} \\
+Gemma-3n         & 5.68  & 5.54 & 4.45/4.44 & 2613 & 7236  & 0.824 & 0.797 & 0.818 & 0.751 & $+2.5$  & $+8.2$  & \ding{51}/\ding{51} \\
+Granite-4.0-H    & 4.41  & 4.32 & 3.99/3.92 & 2348 & 9932  & 0.658 & 0.592 & 0.934 & 0.883 & $+2.0$  & $+5.4$  & \ding{51}/\ding{51} \\
+Ministral-3B     & 4.73  & 3.55 & 4.52/4.57 & 1929 & 12848 & 0.694 & 0.497 & 1.058 & 0.826 & $+25.0$ & $+21.9$ & \ding{51}/\ding{55} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Decoding throughput is comparable between engines and shows no uniform
-pattern (Ollama gains in two models, up to $+10.3\%$ in Llama-3.2-3B, and
-loses in four, with a severe $-25\%$ penalty in Ministral-3B). The decisive
+pattern (Ollama gains in two models, up to $10.3\%$ in Llama-3.2-3B, and
+loses in four, with a severe $25\%$ penalty in Ministral-3B). The decisive
 difference concentrates in TTFT: Ollama introduces a per-request
 initialization overhead that multiplies first-token latency in every model,
 exceeding a factor of six in the worst case (Ministral-3B: 12\,848~ms versus
@@ -1062,11 +1085,10 @@ series---against CPU execution, running the entire model on the accelerator
 through hailo-ollama (RQ5). The Hailo
 backend does not report on inference phases, memory bandwidth, or token
 probabilities; thus, for evaluation we used the reduced FoM defined in
-Eq.~\eqref{eq:fom_red}. Unlike series E0--E4, energy was read from an
-external wall-power meter for \emph{both} substrates, capturing HAT and
-power-supply consumption; the reading includes boot and ${\sim}5$~minutes of
-idle period before inference, so the resulting $\varepsilon$ values are lower
-bounds, comparable within the series but not with E0--E4. Only the two models distributed by Hailo in
+Eq.~\eqref{eq:fom_red} ($\mathrm{FoM}_{\mathrm{red}}$). Unlike series E0--E4, energy was read from an
+external wall-power meter for \emph{both} substrates (CPU/Hailo), capturing the total power consumption, including that of the HAT. The reading includes boot and ${\sim}5$~minutes of
+idle period before inference, so the resulting $\varepsilon$ values are upper
+bounds, comparable within the series but not with E0--E4. Only two models distributed by Hailo in
 precompiled HEF format could be evaluated (DeepSeek-R1-1.5B and
 Llama-3.2-3B). Table~\ref{tab:e5} reports the comparison.
 
@@ -1116,8 +1138,8 @@ the Hailo-10H is therefore \emph{not} recommended for the general case: it is
 advisable only under strict energy constraints, provided that the integrator can
 accept the loss of speed and interactivity, the limitations
 of the accelerator---above all the restricted catalog of precompiled HEF
-models and the context/batch parameters fixed at compilation time---and
-models of sufficient size (Llama-3.2-3B or larger) for the efficiency
+models and the context/batch parameters fixed at compilation time---
+for the efficiency
 advantage to compensate the speed penalty.
 
 \subsection{Synthesis}\label{sec:synthesis}
@@ -1125,13 +1147,14 @@ advantage to compensate the speed penalty.
 The results from the six series converge on a coherent picture articulated around the three
 transversal axes elaborated next. 
 
-\paragraph{Memory bandwidth is the dominant limiting factor.}
-The target platform operates memory-bound during decoding, with
-$\mathrm{MBU}_{\mathrm{corr}}$ between 50 and 72\% in nominal conditions.
-This single bottleneck explains four series: in E1, stronger quantization
-relieves memory traffic and raises throughput monotonically down to
-${\approx}4$~bits; in E2, larger context windows increase KV-cache traffic
-and degrade throughput by up to 22\% in the models most dependent on MBU; in
+\paragraph{Memory bandwidth is the dominant limiting factor.}% rewrite and reprhase w/o memory-bound
+The target platform operates during decoding, with an
+$\mathrm{MBU}_{\mathrm{corr}}$ between 53 and 66\% in nominal conditions.
+This single bottleneck explains four series: in E1, throughput rises
+as weight precision drops from 8 to ${\approx}4$~bpw, because lighter weights
+move less memory per token, and the gain levels off below Q5\_K\_M in
+Llama-3.2-1B; in E2, larger context windows increase KV-cache traffic
+and degrade throughput by up to 22\% in the models with the highest MBU; in
 E3, prefill batch size is irrelevant because single-stream decoding finds no
 additional parallelism; and in E4, llama.cpp's serverless architecture
 reduces first-token latency without altering decoding throughput.
@@ -1140,8 +1163,8 @@ reduces first-token latency without altering decoding throughput.
 Active cooling, Q4\_K\_M quantization, and the llama.cpp engine constitute
 the recommended configuration for interactive deployments: it keeps all six
 models usable and, with Q4\_K\_M, degrades perplexity by less than 5\% with
-respect to Q8\_0, offering the best balance between FoM and quality.
-Q4\_0 and Q3\_K\_M reach the highest FoM and can substitute Q4\_K\_M when
+respect to Q8\_0, offering the best balance between $\mathrm{FoM}_{\mathrm{full}}$ and quality.
+Q4\_0 and Q3\_K\_M reach the highest $\mathrm{FoM}_{\mathrm{full}}$ and can substitute Q4\_K\_M when
 latency or memory dominate, at the cost of higher quality degradation.
 
 \paragraph{Hardware acceleration introduces an asymmetric, model-dependent
@@ -1179,8 +1202,8 @@ The main conclusions are: (i)~active cooling is an enabling requirement, not
 an optimization---without it, thermal throttling collapses compute
 efficiency from ${\approx}0.97$ to ${\approx}0.40$ and renders four of six
 models non-interactive; (ii)~4-bit quantization is the optimum on this
-memory-bound platform, with Q4\_K\_M as the best balance between FoM and
-quality (Q4\_0 and Q3\_K\_M reach a higher FoM), whereas 8-bit and full-precision formats are
+ platform, with Q4\_K\_M as the best balance between $\mathrm{FoM}_{\mathrm{full}}$ and
+quality (Q4\_0 and Q3\_K\_M reach a higher $\mathrm{FoM}_{\mathrm{full}}$), whereas 8-bit and full-precision formats are
 counterproductive; (iii)~context size is a fine-tuning parameter (throughput
 losses up to 22\%) and prefill batch size is irrelevant in single-stream
 inference; (iv)~llama.cpp is the preferable engine when latency matters,
@@ -1225,6 +1248,10 @@ framework with an application-oriented quality layer.
 %% (e.g., collaboration grant, research group) before submission.
 %\begin{acks}
 %\end{acks}
+
+%% TODO: add \Description{...} (alt text, required by acmart for accessibility)
+%% to the figures flagged as "possible image without description" on the
+%% \includegraphics at lines ~750, 761, 776, 799, 917, 928 and 978.
 
 \printbibliography
 
