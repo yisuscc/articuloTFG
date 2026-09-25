@@ -143,7 +143,7 @@ services, with the associated loss of control, auditability, and cost
 predictability.
 
 These factors have motivated the displacement of inference towards the
-acquisition device itself---the \emph{edge AI} paradigm---in which processing
+acquisition device itself (the \emph{edge AI} paradigm), in which processing
 is performed \emph{in situ} and only results are forwarded. Small language
 models (SLMs)~\cite{kamath_llms_2024}, architecturally analogous to their
 massive counterparts but scaled down to a few billion parameters, make this
@@ -193,7 +193,7 @@ contributions of this study are:
     series (E0--E5) covering six state-of-the-art SLMs (1--4 billion (B) parameters),
     five quantization levels, five context-window sizes, five prefill batch
     sizes, two inference engines, and the Hailo-10H accelerator contained in
-    the Raspberry~Pi AI~HAT+~2, totaling 117 instrumented runs
+    the Raspberry~Pi AI~HAT+~2, totaling 113 distinct instrumented runs
     (Section~\ref{sec:results}).
   \item \textbf{Actionable deployment guidance.} Active cooling is an
     enabling requirement rather than an optimization; 4-bit quantization is
@@ -253,7 +253,7 @@ visual inference on embedded IoT hardware, identifying hardware variables
 for rigorous characterization. Benoit-Cattin et
 al.~\cite{benoit-cattin_impact_2020} demonstrated on a Raspberry~Pi~4B that
 thermal throttling appears within seconds under sustained load, making
-thermal control a prerequisite for reproducible experiments---a finding our
+thermal control a prerequisite for reproducible experiments, a finding our
 E0 series confirms and quantifies for generative workloads. More recently,
 Dangwal et al.~\cite{dangwal_reliable_2026} likewise treat frequency
 throttling as a first-order factor in edge deployments, although in their case, it is
@@ -391,7 +391,7 @@ the measurement window, $E_{\mathrm{run}}=\sum_i P_i\,\Delta t =
 reciprocal. Phase-level quantities are likewise derived from
 the samples, by assigning each of them to the load, prefill, or decode window
 delimited by the durations reported by the engine, so that no fixed cost
-distribution across phases is assumed. The aforementioned PMIC also excludes the cooler and USB peripherals, so E0--E4 values are lower
+distribution across phases is assumed. The aforementioned PMIC reports power only and also excludes the cooler and USB peripherals, so the measured power is underestimated and the resulting $\varepsilon$ values of E0--E4 are upper
 bounds; for series E5, we used an external wall-power meter instead
 (Section~\ref{sec:results_e5}).
 
@@ -526,9 +526,9 @@ monitoring thread samples and saves the hardware state (CPU frequency and usage 
 core, temperature, fan speed, RAM, swap, and power) at a configurable period and
 streams each sample to disk, while the main thread runs the prompt sequence
 and stores per-prompt inference metrics immediately after each generation.
-Each run produces three data structures---per-prompt inference metrics (JSONL),
-periodic hardware samples (JSONL), and a summary with the full configuration
-and model metadata (JSON)---in a directory marked by a nanosecond timestamp.
+Each run produces three data structures (per-prompt inference metrics in JSONL,
+periodic hardware samples in JSONL, and a summary with the full configuration
+and model metadata in JSON) in a directory marked by a nanosecond timestamp.
 Reproducibility is guaranteed by pinning the random seed and sampling temperature:
 under identical hardware,engine, and model versions, outputs are deterministic.
 Google Research's full \textit{instruction\_following\_eval}
@@ -646,7 +646,8 @@ the next one~\cite{carrascosa_carro_tfg-yisusccscripts_2026}.
 \caption{Experimental matrix. The reference configuration for all
 actively-cooled series is: llama.cpp, batch size 512, context 4\,096 tokens,
 temperature 0.0, seed 42, 15 prompts. In series E5, we used a context of 2\,048
-tokens, fixed at HEF compilation time.}
+tokens, fixed at HEF compilation time.
+$^{\dagger}$~Only the six Ollama runs are additional: the llama.cpp side of E4 (six runs) reuses the actively-cooled reference runs of E0.}
 \label{tab:matrix}
 \small
 \setlength{\tabcolsep}{5pt}
@@ -659,8 +660,8 @@ E0 & RQ1, RQ6 & Model; cooling & 6 models $\times$ \{fan, no fan\} & 12 \\
 E1 & RQ2 & Quantization & Q3\_K\_M, Q4\_0, Q4\_K\_M, Q5\_K\_M, Q8\_0 (+BF16) & 31 \\
 E2 & RQ3 & Context window & 512, 1\,024, 2\,048, 4\,096, 5\,120 tokens & 30 \\
 E3 & RQ3 & Prefill batch size & 128, 256, 512, 1\,024, 2\,048 & 30 \\
-E4 & RQ4 & Inference engine & llama.cpp vs.\ Ollama & 12 \\
-E5 & RQ5 & Accelerator & CPU (llama.cpp) vs.\ Hailo-10H (hailo-ollama) & 2 \\
+E4 & RQ4 & Inference engine & llama.cpp vs.\ Ollama & 6$^{\dagger}$ \\
+E5 & RQ5 & Accelerator & CPU (llama.cpp) vs.\ Hailo-10H (hailo-ollama) & 4 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -893,9 +894,9 @@ Q3\_K\_M & 4.2 & 1.85 & 5.5 & 4.68 & 3630 & 0.697 & 67.0 &  9.13 (0.18) & 1.108 
 
 The most relevant result is that aggressive quantization not only
 reduces the memory footprint but \emph{improves} the $\mathrm{FoM}_{\mathrm{full}}$ in every
-model: $\mathrm{FoM}_{\mathrm{full}}$ grows monotonically from Q8\_0 towards
+model: $\mathrm{FoM}_{\mathrm{full}}$ grows from Q8\_0 towards
 Q4 and Q3, peaking at Q4\_0 or Q3\_K\_M depending on the model (Figure~\ref{fig:e1_fom_bpw}). The cause is
-twofold: a smaller footprint reduces per-token memory traffic, raising throughput and energy
+is that a smaller footprint reduces per-token memory traffic, raising throughput and energy
 efficiency $\varepsilon$ at the same time. Conversely, Q8\_0 falls
 below the usability threshold in four of the six models, and BF16 sinks
 Llama~3.2~1B to 1.6~tok/s. Excess precision is therefore counterproductive.
@@ -951,7 +952,7 @@ practical observations emerge. First, the RAM footprint grows smoothly and
 predictably with context, reflecting the KV-cache cost: between $+2\%$
 (Granite, whose fixed-size SSM state requires no growing KV cache) and
 $+21\%$ (Llama~3.2~3B) over the full range (Figure~\ref{fig:e2_ram}), never
-exceeding 3.2~GByte---context
+exceeding 3.2~GByte; context
 is not a memory-pressure factor against the platform's 8~GByte RAM. Second, TTFT
 remains essentially flat: reserving a larger window does not increase
 prefill cost while the prompt does not fill it. Third, throughput decreases
@@ -964,8 +965,8 @@ stays close to or below ${\approx}55\%$ across the range, are practically
 insensitive. No model crosses the usability
 threshold within the range. The composite figure of merit follows the same
 pattern (Figure~\ref{fig:e2_fom}): it falls progressively in the
-bandwidth-bound models---DeepSeek from 1.164 to 1.002 ($-14\%$) and
-Llama-3.2-3B from 1.070 to 0.983 ($-8\%$)---while Gemma~3n and Granite stay
+bandwidth-bound models (DeepSeek from 1.164 to 1.002, $-14\%$, and
+Llama-3.2-3B from 1.070 to 0.983, $-8\%$), while Gemma~3n and Granite stay
 flat, confirming that around ${\approx}55\%$ MBU the context ceases to be the
 limiting factor. The practical recommendation is to size the
 context to the smallest value that covers the application's needs.
@@ -1005,7 +1006,7 @@ Gemma~3n and Granite are essentially insensitive. Active cooling.}
 
 In series E3, we varied the prefill batch size across 128--2\,048 (RQ3). The result
 is itself a finding: the parameter has no appreciable effect on any
-metric---RAM, throughput, TTFT, energy per token, and $\mathrm{FoM}_{\mathrm{full}}$ remain constant
+metric: RAM, throughput, TTFT, energy per token, and $\mathrm{FoM}_{\mathrm{full}}$ remain constant
 within experimental noise across the whole range, refuting the working
 hypothesis that larger batches would raise throughput by exploiting the four
 cores. The explanation is direct: in single-stream conversational inference
@@ -1019,11 +1020,14 @@ which are outside the scope of this study.
 
 In series E4, we compared llama.cpp and Ollama running the same models in identical
 configurations, isolating the overhead of the runtime layer (RQ4).
+The llama.cpp runs correspond to the actively-cooled reference runs of series E0 and
+were not repeated; only the six Ollama runs are additional.
 Table~\ref{tab:e4} reports the results.
 
 \begin{table}[!t]
 \centering
-\caption{llama.cpp (l.cpp) versus Ollama per model, with active cooling.
+\caption{llama.cpp (l.cpp) versus Ollama per model, with active cooling. The l.cpp columns are the actively-cooled
+reference runs of series E0 (Table~\ref{tab:e0}).
 Positive $\Delta$ values indicate a llama.cpp advantage and negative values an Ollama advantage. \emph{Us.} marks the
 usability of each engine's run (l.cpp/Ollama) against the corresponding
 per-engine threshold $T_{\mathrm{hum}}$, computed empirically from the text
@@ -1079,15 +1083,15 @@ where operational convenience outweighs immediacy.
 
 \subsection{E5: Hailo-10H Accelerator}\label{sec:results_e5}
 
-Finally, in series E5 we evaluated the Hailo-10H accelerator---contained in the
+Finally, in series E5 we evaluated the Hailo-10H accelerator (contained in the
 Raspberry~Pi AI~HAT+~2 add-on board attached to the platform for this
-series---against CPU execution, running the entire model on the accelerator
+series) against CPU execution, running the entire model on the accelerator
 through hailo-ollama (RQ5). The Hailo
 backend does not report on inference phases, memory bandwidth, or token
 probabilities; thus, for evaluation we used the reduced FoM defined in
 Eq.~\eqref{eq:fom_red} ($\mathrm{FoM}_{\mathrm{red}}$). Unlike series E0--E4, energy was read from an
 external wall-power meter for \emph{both} substrates (CPU/Hailo), capturing the total power consumption, including that of the HAT. The reading includes boot and ${\sim}5$~minutes of
-idle period before inference, so the resulting $\varepsilon$ values are upper
+idle period before inference, so the resulting $\varepsilon$ values are lower
 bounds, comparable within the series but not with E0--E4. Only two models distributed by Hailo in
 precompiled HEF format could be evaluated (DeepSeek-R1-1.5B and
 Llama-3.2-3B). Table~\ref{tab:e5} reports the comparison.
@@ -1127,8 +1131,8 @@ The results refute the expectation of acceleration: the Hailo-10H
 between models. For DeepSeek-R1-1.5B the accelerator offers no appreciable
 energy advantage ($\varepsilon_{\mathrm{norm}}=1.023$), so the CPU dominates
 on both axes: throughput and energy efficiency ($\mathrm{FoM}_{\mathrm{red}}=0.822$). For Llama-3.2-3B the
-energy gain is notable---57\% lower cost per token
-($\varepsilon_{\mathrm{norm}}=2.320$)---which more than compensates the speed
+energy gain is notable (57\% lower cost per token,
+$\varepsilon_{\mathrm{norm}}=2.320$), which more than compensates the speed
 loss and raises $\mathrm{FoM}_{\mathrm{red}}$ to 1.107, above parity with the
 CPU. Usability disqualifies this advantage: Llama-3.2-3B, usable on CPU, falls
 below $T_{\mathrm{hum}}$ on the accelerator. The result must also be read in
@@ -1137,8 +1141,8 @@ Hailo, considerably less optimized than the CPU stack. In its current state,
 the Hailo-10H is therefore \emph{not} recommended for the general case: it is
 advisable only under strict energy constraints, provided that the integrator can
 accept the loss of speed and interactivity, the limitations
-of the accelerator---above all the restricted catalog of precompiled HEF
-models and the context/batch parameters fixed at compilation time---
+of the accelerator (above all the restricted catalog of precompiled HEF
+models and the context/batch parameters fixed at compilation time)
 for the efficiency
 advantage to compensate the speed penalty.
 
@@ -1169,16 +1173,16 @@ latency or memory dominate, at the cost of higher quality degradation.
 
 \paragraph{Hardware acceleration introduces an asymmetric, model-dependent
 balance.}
-The Hailo-10H does not improve throughput---it reduces it by 34--47\%---but
+The Hailo-10H does not improve throughput (it reduces it by 34--47\%) but
 provides a substantial energy advantage for sufficiently large models,
 lifting Llama-3.2-3B above CPU parity
 ($\mathrm{FoM}_{\mathrm{red}}=1.107$) through a 57\% reduction in energy per
 token. Hardware acceleration can pay off in energy-constrained scenarios
 with medium-size models, but it does not replace the CPU in the general
 case: the speed and interactivity loss, the immature software ecosystem, and
-the platform's own restrictions---a catalog limited to the precompiled HEF
+the platform's own restrictions (a catalog limited to the precompiled HEF
 models distributed by the vendor, with context and batch fixed at
-compilation time---currently outweigh the energy advantage outside that
+compilation time) currently outweigh the energy advantage outside that
 niche.
 
 Overall, the results obtained in this study answer the seven research questions initially posed
@@ -1192,14 +1196,14 @@ limits identified in this work.
 
 We have presented a systematic analysis and optimization of SLM 
 inference on the Raspberry~Pi~5, evaluating the impact of six
-experimental factors---cooling, quantization, context size, prefill batch,
-inference engine, and hardware acceleration---on performance, energy
+experimental factors (cooling, quantization, context size, prefill batch,
+inference engine, and hardware acceleration) on performance, energy
 efficiency, and interactive usability, supported by two reusable open-source
 tools (\textit{MonitorSystem} and \textit{monitorviz}) that jointly close the instrumentation
 gap identified in the literature.
 
 The main conclusions are: (i)~active cooling is an enabling requirement, not
-an optimization---without it, thermal throttling collapses compute
+an optimization: without it, thermal throttling collapses compute
 efficiency from ${\approx}0.97$ to ${\approx}0.40$ and renders four of six
 models non-interactive; (ii)~4-bit quantization is the optimum on this
  platform, with Q4\_K\_M as the best balance between $\mathrm{FoM}_{\mathrm{full}}$ and
@@ -1209,7 +1213,7 @@ losses up to 22\%) and prefill batch size is irrelevant in single-stream
 inference; (iv)~llama.cpp is the preferable engine when latency matters,
 with up to $6\times$ lower TTFT than Ollama at comparable decoding
 throughput; (v)~the Hailo-10H accelerator trades throughput for energy and is
-not recommended in the general case---only under energy constraints, with
+not recommended in the general case, only under energy constraints, with
 sufficiently large models, and accepting the loss of interactivity and the
 platform's restrictions on available models;
 (vi)~decoding concentrates virtually the entire temporal and energy cost,
@@ -1221,7 +1225,7 @@ metrics is feasible on this class of platform.
 All experiments targeted a single platform (Raspberry~Pi~5); results do not
 transfer directly to other edge devices with different memory bandwidth and
 thermal envelopes. The internal power sensor in series E0--E4 excludes the
-cooler and peripherals (lower bounds), and its measurement protocol differs
+cooler and peripherals (power is underestimated), and its measurement protocol differs
 from the external meter of E5, precluding absolute cross-series energy
 comparisons. Series E5 is restricted to the two models distributed in
 precompiled HEF format, with context and batch fixed at compilation time.
